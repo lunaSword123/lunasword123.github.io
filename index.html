@@ -1,4 +1,3 @@
-<html>
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
@@ -6,1310 +5,1413 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGSL 1.2 词汇学习工具</title>
     <style>
+        /* CSS Variables */
         :root {
-            --transition: 0.3s ease;
+            --bg: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --fg: #2d3436;
+            --fg-secondary: #636e72;
+            --fg-muted: #b2bec3;
+            --accent: #0984e3;
+            --accent-hover: #0769c0;
+            --card-bg: #ffffff;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --card-hover-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            --border: #e9ecef;
+            --level-a1: #74b9ff;
+            --level-a2: #81ecec;
+            --level-b1: #55efc4;
+            --level-b2: #ffeaa7;
+            --level-c1: #fab1a0;
+            --level-c2: #dfe6e9;
+            --level-unknown: #c8d6e5;
+            --modal-bg: rgba(0,0,0,0.4);
+            --checkbox-border: #dfe6e9;
+            --toast-bg: #2d3436;
+            --input-bg: #ffffff;
+            --input-border: #dfe6e9;
+            --button-secondary: #e9ecef;
+            --button-secondary-hover: #dfe6e9;
         }
-
-        html[data-theme="light"] {
-            --bg: #f7f8fa;
-            --card: #ffffff;
-            --text: #1a1a1a;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --primary: #2563eb;
-            --primary-bg: #eff6ff;
-            --hover: #f3f4f6;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            --level-a1: #7aa874;
-            --level-a2: #5f9ea0;
-            --level-b1: #b5a642;
-            --level-b2: #b8860b;
-            --level-c1: #9b6b9b;
-            --level-c2: #7b5e7b;
-            --unknown: #9ca3af;
+        
+        [data-theme="dark"] {
+            --bg: #1a1d21;
+            --bg-secondary: #22262b;
+            --fg: #f5f6fa;
+            --fg-secondary: #a4b0be;
+            --fg-muted: #57606f;
+            --accent: #48dbfb;
+            --accent-hover: #0abde3;
+            --card-bg: #22262b;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --card-hover-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            --border: #343a40;
+            --level-a1: #5f9ea0;
+            --level-a2: #00b894;
+            --level-b1: #26de81;
+            --level-b2: #fed330;
+            --level-c1: #fd9644;
+            --level-c2: #a55eea;
+            --level-unknown: #576574;
+            --modal-bg: rgba(0,0,0,0.7);
+            --toast-bg: #f5f6fa;
+            --input-bg: #2d3436;
+            --input-border: #343a40;
+            --button-secondary: #343a40;
+            --button-secondary-hover: #485460;
         }
-
-        html[data-theme="dark"] {
-            --bg: #111827;
-            --card: #1f2937;
-            --text: #f9fafb;
-            --muted: #9ca3af;
-            --border: #374151;
-            --primary: #60a5fa;
-            --primary-bg: #1e3a5f;
-            --hover: #374151;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-            --level-a1: #8bc38b;
-            --level-a2: #7fbfbf;
-            --level-b1: #d4c44a;
-            --level-b2: #d4a72c;
-            --level-c1: #c291c2;
-            --level-c2: #a67fa6;
-            --unknown: #6b7280;
-        }
-
-        * {
+        
+        /* Reset */
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
+        
+        /* Base */
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
             background: var(--bg);
-            color: var(--text);
-            transition: background var(--transition), color var(--transition);
+            color: var(--fg);
+            line-height: 1.6;
             min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
         }
-
-        button {
-            font-family: inherit;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            transition: background var(--transition), border-color var(--transition), color var(--transition);
-        }
-
-        button:hover {
-            background: var(--hover);
-        }
-
-        button.active {
-            background: var(--primary-bg);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .toolbar {
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
             position: sticky;
             top: 0;
-            z-index: 10;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 16px;
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 10px;
-            transition: background var(--transition), border-color var(--transition);
+            gap: 1rem;
         }
-
-        .toolbar h1 {
-            font-size: 20px;
+        
+        .logo {
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-right: 8px;
+            color: var(--fg);
+            white-space: nowrap;
         }
-
-        .toolbar-group {
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        /* Toolbar */
+        .toolbar {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
             align-items: center;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .search-box {
+            gap: 0.5rem;
             flex: 1;
-            min-width: 200px;
+            justify-content: flex-end;
         }
-
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 280px;
+            min-width: 150px;
+        }
+        
         .search-box input {
             width: 100%;
-            padding: 9px 12px;
+            padding: 0.5rem 1rem 0.5rem 2.25rem;
+            border: 1px solid var(--input-border);
             border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-            transition: background var(--transition), border-color var(--transition), color var(--transition);
+            background: var(--input-bg);
+            color: var(--fg);
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-
+        
         .search-box input:focus {
-            border-color: var(--primary);
-        }
-
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .filters select {
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            font-size: 14px;
             outline: none;
-            cursor: pointer;
-            transition: background var(--transition), border-color var(--transition), color var(--transition);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(9,132,227,0.15);
         }
-
-        .segmented {
+        
+        .search-box::before {
+            content: "";
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--fg-muted);
+            border-radius: 50%;
+            border-top-color: transparent;
+            border-right-color: transparent;
+        }
+        
+        /* Buttons */
+        .btn {
             display: inline-flex;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .segmented button {
-            border: none;
-            border-radius: 0;
-            background: var(--card);
-            padding: 8px 12px;
-        }
-
-        .segmented button:not(:last-child) {
-            border-right: 1px solid var(--border);
-        }
-
-        .segmented button.active {
-            background: var(--primary-bg);
-            color: var(--primary);
-        }
-
-        .selection-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
             align-items: center;
-            width: 100%;
-            padding-top: 8px;
-        }
-
-        .stats-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: center;
-            padding: 8px 16px;
-            font-size: 13px;
-            color: var(--muted);
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .word-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
-            padding: 16px;
-        }
-
-        .word-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            cursor: pointer;
-            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
-        }
-
-        .word-card:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
-
-        .card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .mark-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .mark-check {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .rank {
-            font-size: 12px;
-            color: var(--muted);
-            user-select: none;
-        }
-
-        .detail-btn {
-            background: none;
-            border: none;
-            color: var(--muted);
-            font-size: 18px;
-            line-height: 1;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        .word-wrap {
-            flex: 1;
-        }
-
-        .word-main {
-            font-size: 26px;
-            font-weight: 700;
-            line-height: 1.2;
-            word-break: break-word;
-        }
-
-        .word-card:not(.revealed) .word-main.word-hidden {
-            display: none;
-        }
-
-        .def-main {
-            font-size: 15px;
-            color: var(--muted);
-            line-height: 1.4;
-        }
-
-        .def-main .def-en {
-            font-weight: 500;
-        }
-
-        .def-main .def-zh {
-            margin-top: 4px;
-        }
-
-        .card-bottom {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .level {
-            font-size: 12px;
-            color: var(--muted);
-            user-select: none;
-        }
-
-        .level-a1 { color: var(--level-a1); }
-        .level-a2 { color: var(--level-a2); }
-        .level-b1 { color: var(--level-b1); }
-        .level-b2 { color: var(--level-b2); }
-        .level-c1 { color: var(--level-c1); }
-        .level-c2 { color: var(--level-c2); }
-        .level-unknown { color: var(--unknown); }
-
-        .pagination {
-            display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
+            gap: 0.375rem;
+            padding: 0.5rem 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-
-        .pagination button:disabled {
+        
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--button-secondary);
+            color: var(--fg);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--button-secondary-hover);
+        }
+        
+        .btn-secondary.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .btn-icon {
+            padding: 0.5rem;
+            min-width: 36px;
+        }
+        
+        .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--text);
-            color: var(--bg);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
+        
+        /* Main */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--fg);
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+        
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .card.marked {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(9,132,227,0.05) 100%);
+        }
+        
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-checkbox {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--checkbox-border);
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .selection-mode .card-checkbox {
+            display: flex;
+        }
+        
+        .card-checkbox.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .card-checkbox.checked::after {
+            content: "";
+            width: 5px;
+            height: 8px;
+            border: 2px solid #fff;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg) translateY(-1px);
+        }
+        
+        .card-word-area {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .card-word {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--fg);
+            transition: opacity 0.3s;
+        }
+        
+        .card-word.hidden-word {
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 100;
+            user-select: none;
         }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-4px);
+        
+        .card-rank {
+            font-size: 0.7rem;
+            color: var(--fg-muted);
+            margin-top: 0.125rem;
         }
-
-        .modal {
+        
+        .card-level {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.75rem;
+            font-size: 0.65rem;
+            font-weight: 500;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            opacity: 0.8;
+        }
+        
+        .card-level[data-level="A1"] { background: var(--level-a1); color: #fff; }
+        .card-level[data-level="A2"] { background: var(--level-a2); color: #2d3436; }
+        .card-level[data-level="B1"] { background: var(--level-b1); color: #2d3436; }
+        .card-level[data-level="B2"] { background: var(--level-b2); color: #2d3436; }
+        .card-level[data-level="C1"] { background: var(--level-c1); color: #2d3436; }
+        .card-level[data-level="C2"] { background: var(--level-c2); color: #2d3436; }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+        
+        .page-info {
+            color: var(--fg-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Modal */
+        .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
+            background: var(--modal-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 50;
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
         }
-
-        .modal-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            max-width: 480px;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-
-        .modal-content {
-            position: relative;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            width: min(92vw, 480px);
-            max-height: 85vh;
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: var(--shadow);
-            z-index: 1;
+            position: relative;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s;
         }
-
+        
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+        
         .modal-header {
             display: flex;
+            align-items: flex-start;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            padding: 1.5rem 1.5rem 1rem;
         }
-
+        
         .modal-word {
-            font-size: 28px;
+            font-size: 1.75rem;
             font-weight: 700;
+            color: var(--fg);
         }
-
+        
         .modal-close {
-            background: none;
+            width: 32px;
+            height: 32px;
             border: none;
-            font-size: 26px;
+            background: var(--button-secondary);
+            border-radius: 8px;
             cursor: pointer;
-            color: var(--muted);
-            line-height: 1;
-        }
-
-        .modal-body {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
         }
-
-        .detail-row {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            gap: 8px;
-            font-size: 15px;
+        
+        .modal-close:hover {
+            background: var(--button-secondary-hover);
         }
-
-        .detail-label {
-            color: var(--muted);
-            font-weight: 500;
+        
+        .modal-close::before,
+        .modal-close::after {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background: var(--fg);
+            border-radius: 1px;
         }
-
-        @media (max-width: 640px) {
-            .toolbar {
-                padding: 10px;
+        
+        .modal-close::before { transform: rotate(45deg); }
+        .modal-close::after { transform: rotate(-45deg); }
+        
+        .modal-body {
+            padding: 0 1.5rem 1.5rem;
+        }
+        
+        .modal-section {
+            margin-bottom: 1rem;
+        }
+        
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modal-label {
+            font-size: 0.75rem;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+        
+        .modal-value {
+            color: var(--fg);
+        }
+        
+        .modal-pos {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background: var(--button-secondary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--fg-secondary);
+        }
+        
+        .modal-def {
+            line-height: 1.5;
+        }
+        
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--fg-secondary);
+        }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+        }
+        
+        .toast {
+            background: var(--toast-bg);
+            color: var(--bg);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        [data-theme="dark"] .toast {
+            color: var(--fg);
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Selection Bar */
+        .selection-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+        
+        .selection-bar.active {
+            transform: translateY(0);
+        }
+        
+        .selection-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .selection-count {
+            font-size: 0.875rem;
+            color: var(--fg-secondary);
+        }
+        
+        .selection-count strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .selection-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--fg-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        /* Focus states */
+        .btn:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        /* Print */
+        @media print {
+            .header, .filter-bar, .pagination, .selection-bar, .toast-container {
+                display: none;
             }
-            .controls {
-                padding: 10px;
+            .cards-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
-            .word-grid {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                gap: 8px;
-                padding: 10px;
-            }
-            .word-main {
-                font-size: 20px;
-            }
-            .detail-row {
-                grid-template-columns: 110px 1fr;
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
-    <header class="toolbar">
-        <h1>NGSL 1.2</h1>
-        <div class="toolbar-group">
-            <button id="btnTheme" title="切换主题">🌙</button>
-            <button id="btnSelectMode">选择</button>
-            <button id="btnRandomAll">全部随机</button>
-            <button id="btnRandomUnknown">生词随机</button>
-            <button id="btnResetSort">重置排序</button>
-            <button id="btnReverse">反转</button>
-            <button id="btnPagination">分页</button>
-            <button id="btnExportMarkGlobal">导出 Mark</button>
-            <label for="importFile" class="btn" style="cursor:pointer; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:14px;">导入 Mark</label>
-            <input type="file" id="importFile" accept=".txt" class="hidden">
-        </div>
-    </header>
-
-    <div class="controls">
-        <div class="search-box">
-            <input id="searchInput" type="search" placeholder="搜索单词、词形、释义..." autocomplete="off">
-        </div>
-        <div class="filters">
-            <select id="levelFilter">
-                <option value="all">全部等级</option>
-                <option value="A1">A1</option>
-                <option value="A2">A2</option>
-                <option value="B1">B1</option>
-                <option value="B2">B2</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
-                <option value="unknown">未知等级</option>
-            </select>
-            <div class="segmented" id="knownFilterSeg">
-                <button data-known="unknown" class="active">仅生词</button>
-                <button data-known="all">全部</button>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">NGSL <span>1.2</span></div>
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索单词或释义..." aria-label="搜索">
+                </div>
+                <button class="btn btn-icon btn-secondary" id="themeToggle" aria-label="切换主题" title="切换主题">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                </button>
             </div>
         </div>
-        <div id="selectionActions" class="selection-actions hidden">
-            <span id="selectedCount">已选择 0 个</span>
-            <button id="btnMarkVisible">标记当前显示</button>
-            <button id="btnUnmarkVisible">取消当前显示</button>
-            <button id="btnExportSelection">导出所选</button>
-            <button id="btnExitSelect">退出选择</button>
+    </header>
+    
+    <main class="main">
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <span class="stat-label">总词数</span>
+                <span class="stat-value" id="totalWords">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">当前显示</span>
+                <span class="stat-value" id="displayWords">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">生词数</span>
+                <span class="stat-value" id="markedWords">-</span>
+            </div>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-group">
+                <button class="btn btn-secondary active" data-filter="unknown" id="filterUnknown">仅生词</button>
+                <button class="btn btn-secondary" data-filter="all" id="filterAll">全部</button>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-secondary" id="randomAll">全部随机</button>
+                <button class="btn btn-secondary" id="randomUnknown">生词随机</button>
+                <button class="btn btn-secondary" id="resetOrder">重置排序</button>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-secondary" id="toggleSelection">选择</button>
+                <button class="btn btn-secondary" id="toggleHideWord">反转背词</button>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-secondary" id="togglePagination">分页</button>
+                <button class="btn btn-secondary" id="importBtn">导入</button>
+                <button class="btn btn-secondary" id="exportBtn">导出</button>
+            </div>
+        </div>
+        
+        <div class="cards-grid selection-mode" id="cardsGrid"></div>
+        
+        <div class="pagination" id="pagination"></div>
+    </main>
+    
+    <div class="selection-bar" id="selectionBar">
+        <div class="selection-bar-content">
+            <div class="selection-count">已选择 <strong id="selectedCount">0</strong> 个</div>
+            <div class="selection-actions">
+                <button class="btn btn-primary" id="markSelected">标记</button>
+                <button class="btn btn-secondary" id="unmarkSelected">取消标记</button>
+                <button class="btn btn-secondary" id="exportSelected">导出所选</button>
+                <button class="btn btn-secondary" id="exitSelection">退出选择</button>
+            </div>
         </div>
     </div>
-
-    <div class="stats-bar">
-        <span id="statTotal">总词数: 0</span>
-        <span id="statShown">当前显示: 0</span>
-        <span id="statMarked">当前生词: 0</span>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-word" id="modalWord"></div>
+                <button class="modal-close" id="modalClose" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
     </div>
-
-    <main id="wordGrid" class="word-grid"></main>
-
-    <div id="pagination" class="pagination hidden">
-        <button id="prevPage">上一页</button>
-        <span id="pageInfo">1 / 1</span>
-        <button id="nextPage">下一页</button>
+    
+    <div class="toast-container">
+        <div class="toast" id="toast"></div>
     </div>
-
-    <div id="toast" class="toast"></div>
-
-    <div id="modal" class="modal hidden">
-        <div class="modal-backdrop" id="modalBackdrop"></div>
-        <div class="modal-content" id="modalContent"></div>
-    </div>
+    
+    <input type="file" id="fileInput" accept=".txt" style="display:none">
 
     <script>
-        (function() {
-            'use strict';
-
-            // ---------- 常量 ----------
-            const STORAGE_MARK = 'ngsl_mark_v3';
-            const STORAGE_THEME = 'ngsl_theme';
-            const STORAGE_PAGINATION = 'ngsl_pagination_mode';
-            const PAGE_SIZE = 20;
-            const ALLOWED_LEVELS = new Set(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-
-            // ---------- 状态 ----------
-            let allData = [];           // 固定 NGSL 词库
-            let displayData = [];       // 当前经过筛选/排序/随机后的数据
-            let markedRanks = new Set(); // 用户个人 Mark（存 Rank）
-            let hasLocalMark = false;   // 本地是否已存在 Mark 数据
-
-            let currentPage = 1;
-            let sortCol = 'rank';
-            let sortAsc = true;
-            let searchQuery = '';
-            let levelFilter = 'all';
-            let knownFilter = 'unknown'; // 'unknown' | 'all'
-            let paginationEnabled = true;
-            let selectionMode = false;
-            let randomMode = null;       // null | 'all' | 'unknown'
-            let hideWordMode = false;
-
-            // DOM 元素
-            const $ = (id) => document.getElementById(id);
-            const wordGrid = $('wordGrid');
-            const searchInput = $('searchInput');
-            const levelFilterEl = $('levelFilter');
-            const knownFilterSeg = $('knownFilterSeg');
-            const selectionActions = $('selectionActions');
-            const selectedCount = $('selectedCount');
-            const statTotal = $('statTotal');
-            const statShown = $('statShown');
-            const statMarked = $('statMarked');
-            const pagination = $('pagination');
-            const prevPageBtn = $('prevPage');
-            const nextPageBtn = $('nextPage');
-            const pageInfo = $('pageInfo');
-            const toast = $('toast');
-            const modal = $('modal');
-            const modalContent = $('modalContent');
-            const modalBackdrop = $('modalBackdrop');
-            const importFile = $('importFile');
-            const btnTheme = $('btnTheme');
-            const btnSelectMode = $('btnSelectMode');
-            const btnRandomAll = $('btnRandomAll');
-            const btnRandomUnknown = $('btnRandomUnknown');
-            const btnResetSort = $('btnResetSort');
-            const btnReverse = $('btnReverse');
-            const btnPagination = $('btnPagination');
-            const btnExportMarkGlobal = $('btnExportMarkGlobal');
-            const btnMarkVisible = $('btnMarkVisible');
-            const btnUnmarkVisible = $('btnUnmarkVisible');
-            const btnExportSelection = $('btnExportSelection');
-            const btnExitSelect = $('btnExitSelect');
-
-            // ---------- 辅助函数 ----------
-            function esc(str) {
-                if (str === null || str === undefined) return '';
-                return String(str).replace(/[&<>"']/g, function(m) {
-                    return {
-                        '&': '&amp;',
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        '"': '&quot;',
-                        "'": '&#39;'
-                    }[m];
+    (function() {
+        'use strict';
+        
+        // ========== 常量 ==========
+        const STORAGE_KEY_MARK = 'ngsl_mark_v3';
+        const STORAGE_KEY_THEME = 'ngsl_theme';
+        const STORAGE_KEY_PAGINATION = 'ngsl_pagination_mode';
+        const PAGE_SIZE = 20;
+        const VALID_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+        
+        // ========== 状态 ==========
+        let allData = [];
+        let displayData = [];
+        let markedRanks = new Set();
+        let tempSelectedRanks = new Set();
+        let currentPage = 1;
+        let searchQuery = '';
+        let knownFilter = 'unknown';
+        let paginationEnabled = true;
+        let selectionMode = false;
+        let randomMode = null;
+        let hideWordMode = false;
+        let wordToRank = new Map();
+        
+        // ========== 工具函数 ==========
+        function esc(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+        
+        function escAttr(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+        
+        function debounce(fn, ms) {
+            let timer = null;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), ms);
+            };
+        }
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        
+        // ========== 数据加载 ==========
+        async function loadNGSL() {
+            try {
+                const res = await fetch('NGSL.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                
+                // 验证数据
+                const rankSet = new Set();
+                const levelStats = {};
+                
+                data.forEach((item, idx) => {
+                    if (item.rank == null) {
+                        console.error('[NGSL] Missing rank at index ' + idx);
+                    }
+                    if (rankSet.has(item.rank)) {
+                        console.error('[NGSL] Duplicate rank: ' + item.rank);
+                    }
+                    rankSet.add(item.rank);
+                    
+                    if (!item.word) {
+                        console.error('[NGSL] Empty word at rank: ' + item.rank);
+                    }
+                    
+                    const level = item.level || 'unknown';
+                    if (!VALID_LEVELS.includes(level)) {
+                        console.warn('[NGSL] Unknown level: ' + level + ' (rank: ' + item.rank + ')');
+                    }
+                    levelStats[level] = (levelStats[level] || 0) + 1;
                 });
-            }
-
-            function escAttr(str) {
-                return esc(str);
-            }
-
-            function debounce(fn, ms) {
-                let timer;
-                return function(...args) {
-                    clearTimeout(timer);
-                    timer = setTimeout(() => fn.apply(this, args), ms);
-                };
-            }
-
-            function showToast(msg) {
-                toast.textContent = msg;
-                toast.classList.add('show');
-                clearTimeout(toast._hideTimer);
-                toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 1800);
-            }
-
-            // ---------- 主题 ----------
-            function loadTheme() {
-                let theme = localStorage.getItem(STORAGE_THEME);
-                if (theme !== 'light' && theme !== 'dark') {
-                    theme = 'light';
+                
+                // 检查连续性
+                const ranks = Array.from(rankSet).sort((a, b) => a - b);
+                if (ranks.length > 0) {
+                    const expected = [];
+                    for (let i = ranks[0]; i <= ranks[ranks.length - 1]; i++) {
+                        if (!rankSet.has(i)) expected.push(i);
+                    }
+                    if (expected.length > 0) {
+                        console.warn('[NGSL] Missing ranks:', expected.slice(0, 10).join(', ') + (expected.length > 10 ? '...' : ''));
+                    }
                 }
-                document.documentElement.setAttribute('data-theme', theme);
-                updateThemeButton(theme);
+                
+                allData = data;
+                
+                // 建立word到rank的映射
+                wordToRank.clear();
+                data.forEach(item => {
+                    if (item.word) {
+                        wordToRank.set(item.word.toLowerCase().trim(), item.rank);
+                    }
+                });
+                
+                console.log('[NGSL] Loaded: ' + data.length + ' words');
+                console.log('[NGSL] Level statistics:', levelStats);
+                
+                return true;
+            } catch (err) {
+                console.error('[NGSL] Failed to load NGSL.json:', err);
+                showToast('词库加载失败');
+                return false;
             }
-
-            function updateThemeButton(theme) {
-                btnTheme.textContent = theme === 'light' ? '🌙' : '☀️';
+        }
+        
+        async function loadUnknown() {
+            try {
+                const res = await fetch('NGSL_Unknown.txt');
+                if (!res.ok) {
+                    console.warn('[NGSL] NGSL_Unknown.txt not found, using empty set');
+                    return [];
+                }
+                const text = await res.text();
+                const words = text.split('\n')
+                    .map(w => w.trim())
+                    .filter(w => w.length > 0);
+                
+                console.log('[NGSL] Unknown file loaded: ' + words.length + ' words');
+                return words;
+            } catch (err) {
+                console.error('[NGSL] Failed to load NGSL_Unknown.txt:', err);
+                return [];
             }
-
-            function toggleTheme() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'light' ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem(STORAGE_THEME, next);
-                updateThemeButton(next);
+        }
+        
+        function loadLocalMark() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY_MARK);
+                if (saved) {
+                    const arr = JSON.parse(saved);
+                    if (Array.isArray(arr)) {
+                        markedRanks = new Set(arr);
+                        console.log('[NGSL] Mark loaded: ' + markedRanks.size + ' words');
+                        return true;
+                    }
+                }
+            } catch (err) {
+                console.warn('[NGSL] Failed to parse local mark:', err);
             }
-
-            // ---------- 分页偏好 ----------
-            function loadPaginationPreference() {
-                const saved = localStorage.getItem(STORAGE_PAGINATION);
+            return false;
+        }
+        
+        function saveLocalMark() {
+            try {
+                const arr = Array.from(markedRanks);
+                localStorage.setItem(STORAGE_KEY_MARK, JSON.stringify(arr));
+            } catch (err) {
+                console.error('[NGSL] Failed to save mark:', err);
+            }
+        }
+        
+        function loadTheme() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY_THEME);
+                if (saved) {
+                    document.documentElement.setAttribute('data-theme', saved);
+                    updateThemeIcon(saved);
+                }
+            } catch (err) {
+                console.warn('[NGSL] Failed to load theme:', err);
+            }
+        }
+        
+        function loadPaginationPreference() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY_PAGINATION);
                 if (saved === 'unpaginate') {
                     paginationEnabled = false;
-                } else {
-                    paginationEnabled = true;
                 }
-                updatePaginationButton();
+            } catch (err) {
+                console.warn('[NGSL] Failed to load pagination preference:', err);
             }
-
-            function savePaginationPreference() {
-                localStorage.setItem(STORAGE_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate');
+        }
+        
+        function savePaginationPreference() {
+            localStorage.setItem(STORAGE_KEY_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate');
+        }
+        
+        // ========== 显示逻辑 ==========
+        function getDisplayData() {
+            let data = allData.slice();
+            
+            // 搜索过滤
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                data = data.filter(item => {
+                    if (item.word && item.word.toLowerCase().includes(q)) return true;
+                    if (item.forms && item.forms.toLowerCase().includes(q)) return true;
+                    if (item.def_en && item.def_en.toLowerCase().includes(q)) return true;
+                    if (item.def_zh && item.def_zh.toLowerCase().includes(q)) return true;
+                    return false;
+                });
             }
-
-            function updatePaginationButton() {
-                btnPagination.textContent = paginationEnabled ? '分页' : '不分页';
+            
+            // 生词过滤
+            if (knownFilter === 'unknown') {
+                data = data.filter(item => markedRanks.has(item.rank));
             }
-
-            function togglePagination() {
+            
+            // 随机
+            if (randomMode === 'all') {
+                data = shuffleArray(data);
+            } else if (randomMode === 'unknown') {
+                data = shuffleArray(data);
+            }
+            
+            return data;
+        }
+        
+        function shuffleArray(arr) {
+            const result = arr.slice();
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+        
+        function render() {
+            displayData = getDisplayData();
+            renderStats();
+            renderCards();
+            renderPagination();
+            updateSelectionBar();
+            updateFilterButtons();
+        }
+        
+        function renderStats() {
+            document.getElementById('totalWords').textContent = allData.length;
+            document.getElementById('displayWords').textContent = displayData.length;
+            document.getElementById('markedWords').textContent = markedRanks.size;
+        }
+        
+        function renderCards() {
+            const grid = document.getElementById('cardsGrid');
+            
+            if (displayData.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">(_EMPTY_)</div><p>没有找到匹配的单词</p></div>';
+                return;
+            }
+            
+            let data = displayData;
+            let startIdx = 0;
+            let endIdx = data.length;
+            
+            if (paginationEnabled && !searchQuery) {
+                startIdx = (currentPage - 1) * PAGE_SIZE;
+                endIdx = Math.min(startIdx + PAGE_SIZE, data.length);
+            }
+            
+            let html = '';
+            for (let i = startIdx; i < endIdx; i++) {
+                const item = data[i];
+                const isMarked = markedRanks.has(item.rank);
+                const isTempSelected = tempSelectedRanks.has(item.rank);
+                const level = VALID_LEVELS.includes(item.level) ? item.level : 'unknown';
+                
+                html += '<div class="card' + (isMarked ? ' marked' : '') + '" data-rank="' + item.rank + '" style="animation-delay:' + ((i - startIdx) * 0.03) + 's">' +
+                    '<div class="card-content">' +
+                        '<div class="card-checkbox' + (isTempSelected ? ' checked' : '') + '"></div>' +
+                        '<div class="card-word-area">' +
+                            '<div class="card-word' + (hideWordMode ? ' hidden-word' : '') + '">' + esc(item.word) + '</div>' +
+                            '<div class="card-rank">#' + item.rank + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="card-level" data-level="' + escAttr(level) + '">' + esc(level) + '</span>' +
+                '</div>';
+            }
+            
+            grid.innerHTML = html;
+            grid.classList.toggle('selection-mode', selectionMode);
+        }
+        
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            
+            if (!paginationEnabled || searchQuery || displayData.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            const totalPages = Math.ceil(displayData.length / PAGE_SIZE);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '<span class="page-info">共 ' + displayData.length + ' 词</span>';
+                return;
+            }
+            
+            let html = '<button class="btn btn-secondary" data-page="prev"' + (currentPage === 1 ? ' disabled' : '') + '>上一页</button>';
+            html += '<span class="page-info"> ' + currentPage + ' / ' + totalPages + ' </span>';
+            html += '<button class="btn btn-secondary" data-page="next"' + (currentPage === totalPages ? ' disabled' : '') + '>下一页</button>';
+            
+            container.innerHTML = html;
+        }
+        
+        function updateSelectionBar() {
+            const bar = document.getElementById('selectionBar');
+            bar.classList.toggle('active', selectionMode);
+            document.getElementById('selectedCount').textContent = tempSelectedRanks.size;
+        }
+        
+        function updateFilterButtons() {
+            document.getElementById('filterUnknown').classList.toggle('active', knownFilter === 'unknown');
+            document.getElementById('filterAll').classList.toggle('active', knownFilter === 'all');
+            document.getElementById('togglePagination').classList.toggle('active', paginationEnabled);
+            document.getElementById('toggleHideWord').classList.toggle('active', hideWordMode);
+        }
+        
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (theme === 'dark') {
+                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            } else {
+                icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+            }
+        }
+        
+        // ========== 详情弹窗 ==========
+        function showDetail(rank) {
+            const item = allData.find(d => d.rank === rank);
+            if (!item) return;
+            
+            document.getElementById('modalWord').textContent = item.word || '';
+            
+            let bodyHtml = '';
+            
+            // POS
+            if (item.pos) {
+                bodyHtml += '<div class="modal-section"><div class="modal-label">词性</div><span class="modal-pos">' + esc(item.pos) + '</span></div>';
+            }
+            
+            // Forms
+            if (item.forms) {
+                bodyHtml += '<div class="modal-section"><div class="modal-label">词形变化</div><div class="modal-value">' + esc(item.forms) + '</div></div>';
+            }
+            
+            // English Definition
+            if (item.def_en) {
+                bodyHtml += '<div class="modal-section"><div class="modal-label">英文释义</div><div class="modal-value modal-def">' + esc(item.def_en) + '</div></div>';
+            }
+            
+            // Pronunciation
+            if (item.pron) {
+                bodyHtml += '<div class="modal-section"><div class="modal-label">发音</div><div class="modal-value">' + esc(item.pron) + '</div></div>';
+            }
+            
+            // Chinese Definition
+            if (item.def_zh) {
+                bodyHtml += '<div class="modal-section"><div class="modal-label">中文释义</div><div class="modal-value modal-def">' + esc(item.def_zh) + '</div></div>';
+            }
+            
+            // Meta
+            const level = VALID_LEVELS.includes(item.level) ? item.level : 'unknown';
+            bodyHtml += '<div class="modal-meta">';
+            bodyHtml += '<span>Level: ' + esc(level) + '</span>';
+            bodyHtml += '<span>Rank: ' + item.rank + '</span>';
+            if (item.sfi != null) bodyHtml += '<span>SFI: ' + item.sfi + '</span>';
+            bodyHtml += '</div>';
+            
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // ========== 导入导出 ==========
+        function exportMark() {
+            if (markedRanks.size === 0) {
+                showToast('没有可导出的词');
+                return;
+            }
+            
+            const words = [];
+            markedRanks.forEach(rank => {
+                const item = allData.find(d => d.rank === rank);
+                if (item && item.word) words.push(item.word);
+            });
+            
+            const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Mark.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('已导出 ' + words.length + ' 个词');
+        }
+        
+        function importMark(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const words = text.split('\n')
+                    .map(w => w.trim())
+                    .filter(w => w.length > 0);
+                
+                let imported = 0;
+                let notFound = 0;
+                
+                words.forEach(word => {
+                    const rank = wordToRank.get(word.toLowerCase());
+                    if (rank != null) {
+                        markedRanks.add(rank);
+                        imported++;
+                    } else {
+                        notFound++;
+                        console.warn('[NGSL] Import: word not found:', word);
+                    }
+                });
+                
+                saveLocalMark();
+                render();
+                showToast('已导入 ' + imported + ' 个词' + (notFound > 0 ? '，' + notFound + ' 个未找到' : ''));
+            };
+            reader.readAsText(file);
+        }
+        
+        function exportSelected() {
+            if (tempSelectedRanks.size === 0) {
+                showToast('没有可导出的词');
+                return;
+            }
+            
+            const words = [];
+            tempSelectedRanks.forEach(rank => {
+                const item = allData.find(d => d.rank === rank);
+                if (item && item.word) words.push(item.word);
+            });
+            
+            const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Selected.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('已导出 ' + words.length + ' 个词');
+        }
+        
+        // ========== 事件绑定 ==========
+        function bindEvents() {
+            // 搜索
+            const searchInput = document.getElementById('searchInput');
+            const doSearch = debounce(function() {
+                searchQuery = searchInput.value.trim();
+                currentPage = 1;
+                render();
+            }, 300);
+            searchInput.addEventListener('input', doSearch);
+            
+            // 快捷键
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement !== searchInput) {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+            
+            // 主题切换
+            document.getElementById('themeToggle').addEventListener('click', function() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem(STORAGE_KEY_THEME, next);
+                updateThemeIcon(next);
+            });
+            
+            // 过滤按钮
+            document.getElementById('filterUnknown').addEventListener('click', function() {
+                knownFilter = 'unknown';
+                currentPage = 1;
+                render();
+            });
+            
+            document.getElementById('filterAll').addEventListener('click', function() {
+                knownFilter = 'all';
+                currentPage = 1;
+                render();
+            });
+            
+            // 随机
+            document.getElementById('randomAll').addEventListener('click', function() {
+                randomMode = 'all';
+                currentPage = 1;
+                render();
+                showToast('已随机排列');
+            });
+            
+            document.getElementById('randomUnknown').addEventListener('click', function() {
+                randomMode = 'unknown';
+                currentPage = 1;
+                render();
+                showToast('已随机排列生词');
+            });
+            
+            document.getElementById('resetOrder').addEventListener('click', function() {
+                randomMode = null;
+                currentPage = 1;
+                render();
+                showToast('已恢复默认排序');
+            });
+            
+            // 选择模式
+            document.getElementById('toggleSelection').addEventListener('click', function() {
+                if (!selectionMode) {
+                    // 进入选择模式时，退出随机
+                    randomMode = null;
+                    selectionMode = true;
+                    tempSelectedRanks = new Set(markedRanks);
+                    currentPage = 1;
+                    render();
+                }
+            });
+            
+            document.getElementById('exitSelection').addEventListener('click', function() {
+                selectionMode = false;
+                tempSelectedRanks.clear();
+                render();
+            });
+            
+            document.getElementById('markSelected').addEventListener('click', function() {
+                tempSelectedRanks.forEach(rank => markedRanks.add(rank));
+                saveLocalMark();
+                selectionMode = false;
+                tempSelectedRanks.clear();
+                render();
+                showToast('已标记');
+            });
+            
+            document.getElementById('unmarkSelected').addEventListener('click', function() {
+                tempSelectedRanks.forEach(rank => markedRanks.delete(rank));
+                saveLocalMark();
+                selectionMode = false;
+                tempSelectedRanks.clear();
+                render();
+                showToast('已取消标记');
+            });
+            
+            document.getElementById('exportSelected').addEventListener('click', exportSelected);
+            
+            // 反转背词
+            document.getElementById('toggleHideWord').addEventListener('click', function() {
+                hideWordMode = !hideWordMode;
+                render();
+            });
+            
+            // 分页
+            document.getElementById('togglePagination').addEventListener('click', function() {
                 paginationEnabled = !paginationEnabled;
                 savePaginationPreference();
-                updatePaginationButton();
                 currentPage = 1;
-                applyDisplay();
                 render();
-            }
-
-            // ---------- Mark 本地存储 ----------
-            function loadLocalMark() {
-                const raw = localStorage.getItem(STORAGE_MARK);
-                hasLocalMark = raw !== null;
-                markedRanks = new Set();
-                if (!hasLocalMark) return;
-                try {
-                    const arr = JSON.parse(raw);
-                    if (!Array.isArray(arr)) throw new Error('mark is not array');
-                    arr.forEach(n => {
-                        if (Number.isInteger(n)) markedRanks.add(n);
-                    });
-                } catch (e) {
-                    console.warn('[NGSL] Invalid localStorage mark, resetting', e);
-                    markedRanks = new Set();
-                    hasLocalMark = false;
+            });
+            
+            // 分页按钮
+            document.getElementById('pagination').addEventListener('click', function(e) {
+                const btn = e.target.closest('[data-page]');
+                if (!btn) return;
+                const action = btn.dataset.page;
+                const totalPages = Math.ceil(displayData.length / PAGE_SIZE);
+                
+                if (action === 'prev' && currentPage > 1) {
+                    currentPage--;
+                    render();
+                } else if (action === 'next' && currentPage < totalPages) {
+                    currentPage++;
+                    render();
                 }
-            }
-
-            function saveLocalMark() {
-                try {
-                    const arr = [...markedRanks].sort((a, b) => a - b);
-                    localStorage.setItem(STORAGE_MARK, JSON.stringify(arr));
-                } catch (e) {
-                    console.warn('[NGSL] Failed to save mark', e);
-                }
-            }
-
-            // ---------- CSV 解析器（标准 CSV，支持引号、转义、换行）----------
-            function parseCSV(text) {
-                if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-                const rows = [];
-                let row = [];
-                let field = '';
-                let inQuotes = false;
-
-                for (let i = 0; i < text.length; i++) {
-                    const c = text[i];
-                    if (inQuotes) {
-                        if (c === '"') {
-                            if (i + 1 < text.length && text[i + 1] === '"') {
-                                field += '"';
-                                i++;
-                            } else {
-                                inQuotes = false;
-                            }
-                        } else {
-                            field += c;
-                        }
+            });
+            
+            // 卡片点击
+            document.getElementById('cardsGrid').addEventListener('click', function(e) {
+                const card = e.target.closest('.card');
+                if (!card) return;
+                
+                const rank = parseInt(card.dataset.rank, 10);
+                
+                if (selectionMode) {
+                    // 选择模式：切换选中状态
+                    if (tempSelectedRanks.has(rank)) {
+                        tempSelectedRanks.delete(rank);
                     } else {
-                        if (c === '"') {
-                            inQuotes = true;
-                        } else if (c === ',') {
-                            row.push(field);
-                            field = '';
-                        } else if (c === '\n') {
-                            row.push(field);
-                            rows.push(row);
-                            row = [];
-                            field = '';
-                        } else if (c === '\r') {
-                            // 跳过 \r，\n 会触发换行
-                        } else {
-                            field += c;
-                        }
+                        tempSelectedRanks.add(rank);
                     }
+                    renderCards();
+                    updateSelectionBar();
+                } else {
+                    // 正常模式：显示详情
+                    showDetail(rank);
                 }
-                if (field.length > 0 || row.length > 0) {
-                    row.push(field);
-                    rows.push(row);
-                }
-
-                if (rows.length < 2) return [];
-                const headers = rows[0].map(h => h.trim());
-                const data = [];
-                for (let i = 1; i < rows.length; i++) {
-                    const cells = rows[i];
-                    if (cells.length === 0 || (cells.length === 1 && cells[0].trim() === '')) continue;
-                    const obj = {};
-                    headers.forEach((h, idx) => {
-                        obj[h] = cells[idx] !== undefined ? cells[idx] : '';
-                    });
-                    obj.rank = Number(obj.rank);
-                    obj.sfi = obj.sfi !== undefined && obj.sfi !== '' ? Number(obj.sfi) : null;
-                    obj.u_value = obj.u_value !== undefined && obj.u_value !== '' ? Number(obj.u_value) : null;
-                    data.push(obj);
-                }
-                return data;
+            });
+            
+            // 弹窗关闭
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            document.getElementById('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+            
+            // 导入导出
+            document.getElementById('exportBtn').addEventListener('click', exportMark);
+            
+            document.getElementById('importBtn').addEventListener('click', function() {
+                document.getElementById('fileInput').click();
+            });
+            
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) importMark(file);
+                e.target.value = '';
+            });
+        }
+        
+        // ========== 初始化 ==========
+        async function init() {
+            console.log('[NGSL] Initializing...');
+            
+            loadTheme();
+            loadPaginationPreference();
+            
+            const hasLocalMark = loadLocalMark();
+            
+            const loaded = await loadNGSL();
+            if (!loaded) {
+                showToast('词库加载失败，请刷新页面重试');
+                return;
             }
-
-            function normalizeItem(raw) {
-                return {
-                    rank: Number(raw.rank),
-                    word: String(raw.word || '').trim(),
-                    forms: String(raw.forms || ''),
-                    pron: String(raw.pron || ''),
-                    pos: String(raw.pos || ''),
-                    def_zh: String(raw.def_zh || ''),
-                    def_en: String(raw.def_en || ''),
-                    level: String(raw.level || ''),
-                    sfi: raw.sfi !== undefined && raw.sfi !== null && !isNaN(Number(raw.sfi)) ? Number(raw.sfi) : null,
-                    u_value: raw.u_value !== undefined && raw.u_value !== null && !isNaN(Number(raw.u_value)) ? Number(raw.u_value) : null
-                };
-            }
-
-            // ---------- 数据加载 ----------
-            async function loadNGSL() {
-                try {
-                    const res = await fetch('NGSL.json');
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const json = await res.json();
-                    if (!Array.isArray(json)) throw new Error('JSON is not array');
-                    allData = json.map(normalizeItem);
-                } catch (err) {
-                    console.warn('[NGSL] JSON load failed, trying CSV...', err);
-                    try {
-                        const res = await fetch('NGSL.csv');
-                        if (!res.ok) throw new Error('CSV HTTP ' + res.status);
-                        const text = await res.text();
-                        const parsed = parseCSV(text);
-                        if (!parsed.length) throw new Error('CSV parsed empty');
-                        allData = parsed.map(normalizeItem);
-                    } catch (csvErr) {
-                        console.error('[NGSL] CSV load also failed', csvErr);
-                        throw new Error('无法加载 NGSL 数据');
-                    }
-                }
-                if (!allData.length) throw new Error('NGSL data is empty');
-            }
-
-            async function loadUnknown() {
-                const res = await fetch('NGSL_Unknown.txt');
-                if (!res.ok) throw new Error('Unknown HTTP ' + res.status);
-                const text = await res.text();
-                const words = text.split(/\r?\n/)
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0);
-                const ranks = [];
-                words.forEach(word => {
-                    const found = allData.find(d => d.word.toLowerCase() === word.toLowerCase());
-                    if (found) {
-                        ranks.push(found.rank);
+            
+            if (!hasLocalMark) {
+                const unknownWords = await loadUnknown();
+                unknownWords.forEach(word => {
+                    const rank = wordToRank.get(word.toLowerCase());
+                    if (rank != null) {
+                        markedRanks.add(rank);
                     } else {
                         console.warn('[NGSL] Unknown word not found in NGSL:', word);
                     }
                 });
-                return ranks;
-            }
-
-            // ---------- 数据完整性校验 ----------
-            function validateData() {
-                if (allData.length === 0) return;
-                if (allData.length !== 2809) {
-                    console.warn('[NGSL] Data length is', allData.length, 'expected 2809');
-                }
-                const rankSet = new Set();
-                const missing = [];
-                const duplicates = [];
-                allData.forEach(d => {
-                    if (!Number.isInteger(d.rank)) {
-                        console.error('[NGSL] Invalid rank:', d.rank);
-                        return;
-                    }
-                    if (rankSet.has(d.rank)) {
-                        duplicates.push(d.rank);
-                    } else {
-                        rankSet.add(d.rank);
-                    }
-                    if (!d.word) {
-                        console.error('[NGSL] Empty word at rank', d.rank);
-                    }
-                });
-                for (let r = 1; r <= 2809; r++) {
-                    if (!rankSet.has(r)) missing.push(r);
-                }
-                if (duplicates.length) console.error('[NGSL] Duplicate ranks:', duplicates);
-                if (missing.length) console.error('[NGSL] Missing ranks:', missing);
-
-                // Level 检查
-                const unknownLevels = new Set();
-                allData.forEach(d => {
-                    if (!ALLOWED_LEVELS.has(d.level)) {
-                        unknownLevels.add(d.level);
-                    }
-                });
-                if (unknownLevels.size) {
-                    unknownLevels.forEach(lv => console.warn('[NGSL] Unknown level detected:', lv));
-                }
-
-                // 日志统计
-                const stats = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, Unknown: 0 };
-                allData.forEach(d => {
-                    if (ALLOWED_LEVELS.has(d.level)) stats[d.level]++;
-                    else stats.Unknown++;
-                });
-                console.log('NGSL loaded:', allData.length, 'words');
-                console.log('Level statistics:');
-                console.table(stats);
-            }
-
-            // ---------- 数据流水线 ----------
-            function matchesSearch(item) {
-                const q = searchQuery.toLowerCase();
-                return [item.word, item.forms, item.def_en, item.def_zh].some(v => {
-                    return v && String(v).toLowerCase().includes(q);
-                });
-            }
-
-            function getBaseFiltered() {
-                let list = allData.slice();
-                if (searchQuery.trim()) {
-                    list = list.filter(matchesSearch);
-                }
-                if (levelFilter !== 'all') {
-                    if (levelFilter === 'unknown') {
-                        list = list.filter(d => !ALLOWED_LEVELS.has(d.level));
-                    } else {
-                        list = list.filter(d => d.level === levelFilter);
-                    }
-                }
-                return list;
-            }
-
-            function applyDisplay() {
-                let list = getBaseFiltered();
-
-                if (randomMode === 'unknown') {
-                    list = list.filter(d => markedRanks.has(d.rank));
-                } else if (randomMode === 'all') {
-                    // 全部随机：不过滤 known，但保留搜索和等级
-                } else {
-                    if (knownFilter === 'unknown') {
-                        list = list.filter(d => markedRanks.has(d.rank));
-                    }
-                }
-
-                if (randomMode === 'all' || randomMode === 'unknown') {
-                    shuffle(list);
-                } else {
-                    if (sortCol === 'rank') {
-                        list.sort((a, b) => sortAsc ? a.rank - b.rank : b.rank - a.rank);
-                    } else if (sortCol === 'word') {
-                        list.sort((a, b) => {
-                            const cmp = a.word.localeCompare(b.word);
-                            return sortAsc ? cmp : -cmp;
-                        });
-                    }
-                }
-
-                displayData = list;
-                if (currentPage > Math.max(1, Math.ceil(displayData.length / PAGE_SIZE))) {
-                    currentPage = 1;
-                }
-            }
-
-            function shuffle(arr) {
-                for (let i = arr.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [arr[i], arr[j]] = [arr[j], arr[i]];
-                }
-            }
-
-            function getCurrentPageItems() {
-                const searchActive = searchQuery.trim() !== '';
-                if (searchActive || !paginationEnabled) {
-                    return displayData;
-                }
-                const start = (currentPage - 1) * PAGE_SIZE;
-                return displayData.slice(start, start + PAGE_SIZE);
-            }
-
-            // ---------- 渲染 ----------
-            function render() {
-                renderGrid();
-                renderPagination();
-                updateStats();
-                updateSelectionUI();
-            }
-
-            function levelDisplay(item) {
-                return ALLOWED_LEVELS.has(item.level) ? item.level : '未知';
-            }
-
-            function levelClass(item) {
-                if (ALLOWED_LEVELS.has(item.level)) {
-                    return 'level-' + item.level.toLowerCase();
-                }
-                return 'level-unknown';
-            }
-
-            function cardHTML(item) {
-                const isMarked = markedRanks.has(item.rank);
-                const lv = levelDisplay(item);
-                const lvClass = levelClass(item);
-                const defEn = item.def_en || '';
-                const defZh = item.def_zh || '';
-                const wordHiddenClass = hideWordMode ? 'word-hidden' : '';
-                const defHiddenClass = hideWordMode ? '' : 'hidden';
-                return `
-                    <article class="word-card" data-rank="${item.rank}">
-                        <div class="card-top">
-                            <label class="mark-label ${selectionMode ? '' : 'hidden'}">
-                                <input type="checkbox" class="mark-check" data-rank="${item.rank}" ${isMarked ? 'checked' : ''}>
-                            </label>
-                            <span class="rank">#${item.rank}</span>
-                            <button class="detail-btn" data-rank="${item.rank}" title="查看详情">ⓘ</button>
-                        </div>
-                        <div class="word-wrap">
-                            <div class="word-main ${wordHiddenClass}">${esc(item.word)}</div>
-                            <div class="def-main ${defHiddenClass}">
-                                <div class="def-en">${esc(defEn)}</div>
-                                <div class="def-zh">${esc(defZh)}</div>
-                            </div>
-                        </div>
-                        <div class="card-bottom">
-                            <span class="level ${lvClass}">${esc(lv)}</span>
-                        </div>
-                    </article>
-                `;
-            }
-
-            function renderGrid() {
-                const items = getCurrentPageItems();
-                if (!items.length) {
-                    wordGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;">没有符合条件的词条</div>';
-                    return;
-                }
-                wordGrid.innerHTML = items.map(cardHTML).join('');
-            }
-
-            function renderPagination() {
-                const searchActive = searchQuery.trim() !== '';
-                const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
-                if (searchActive || !paginationEnabled || displayData.length === 0) {
-                    pagination.classList.add('hidden');
-                    return;
-                }
-                pagination.classList.remove('hidden');
-                if (currentPage > totalPages) currentPage = totalPages;
-                pageInfo.textContent = `${currentPage} / ${totalPages}`;
-                prevPageBtn.disabled = currentPage <= 1;
-                nextPageBtn.disabled = currentPage >= totalPages;
-            }
-
-            function updateStats() {
-                statTotal.textContent = '总词数: ' + allData.length;
-                statShown.textContent = '当前显示: ' + displayData.length;
-                statMarked.textContent = '当前生词: ' + markedRanks.size;
-            }
-
-            function updateSelectedCount() {
-                selectedCount.textContent = '已选择 ' + markedRanks.size + ' 个';
-            }
-
-            function updateSelectionUI() {
-                if (selectionMode) {
-                    selectionActions.classList.remove('hidden');
-                    wordGrid.classList.add('selection-mode');
-                    btnSelectMode.textContent = '退出选择';
-                } else {
-                    selectionActions.classList.add('hidden');
-                    wordGrid.classList.remove('selection-mode');
-                    btnSelectMode.textContent = '选择';
-                }
-                updateSelectedCount();
-            }
-
-            // ---------- 详情弹窗 ----------
-            function openModal(rank) {
-                const item = allData.find(d => d.rank === rank);
-                if (!item) return;
-                const lv = levelDisplay(item);
-                modalContent.innerHTML = `
-                    <div class="modal-header">
-                        <div class="modal-word">${esc(item.word)}</div>
-                        <button class="modal-close" id="modalCloseBtn">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="detail-row"><span class="detail-label">词性</span><span>${esc(item.pos || '—')}</span></div>
-                        <div class="detail-row"><span class="detail-label">词形变化</span><span>${esc(item.forms || '—')}</span></div>
-                        <div class="detail-row"><span class="detail-label">英文释义</span><span>${esc(item.def_en || '—')}</span></div>
-                        <div class="detail-row"><span class="detail-label">发音</span><span>${esc(item.pron || '—')}</span></div>
-                        <div class="detail-row"><span class="detail-label">中文释义</span><span>${esc(item.def_zh || '—')}</span></div>
-                        <div class="detail-row"><span class="detail-label">等级</span><span>${esc(lv)}</span></div>
-                        <div class="detail-row"><span class="detail-label">Rank</span><span>${item.rank}</span></div>
-                        <div class="detail-row"><span class="detail-label">SFI</span><span>${item.sfi !== null && item.sfi !== undefined ? item.sfi : '—'}</span></div>
-                        <div class="detail-row"><span class="detail-label">U Value</span><span>${item.u_value !== null && item.u_value !== undefined ? item.u_value : '—'}</span></div>
-                    </div>
-                `;
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-                const closeBtn = $('modalCloseBtn');
-                if (closeBtn) closeBtn.addEventListener('click', closeModal);
-            }
-
-            function closeModal() {
-                modal.classList.add('hidden');
-                document.body.style.overflow = '';
-            }
-
-            // ---------- 选择模式 ----------
-            function enterSelectionMode() {
-                selectionMode = true;
-                randomMode = null;
-                sortCol = 'rank';
-                sortAsc = true;
-                currentPage = 1;
-                applyDisplay();
-                render();
-            }
-
-            function exitSelectionMode() {
-                selectionMode = false;
-                applyDisplay();
-                render();
-            }
-
-            function markVisible(shouldMark) {
-                const items = getCurrentPageItems();
-                items.forEach(item => {
-                    if (shouldMark) markedRanks.add(item.rank);
-                    else markedRanks.delete(item.rank);
-                });
                 saveLocalMark();
-                renderGrid();
-                updateStats();
-                updateSelectedCount();
+                console.log('[NGSL] Initialized from unknown file: ' + markedRanks.size + ' words');
             }
-
-            // ---------- 导出 / 导入 Mark ----------
-            function exportMark() {
-                const words = [...markedRanks]
-                    .sort((a, b) => a - b)
-                    .map(r => {
-                        const item = allData.find(d => d.rank === r);
-                        return item ? item.word : null;
-                    })
-                    .filter(Boolean);
-                if (!words.length) {
-                    showToast('没有可导出的词');
-                    return;
-                }
-                const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Mark.txt';
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('已导出');
-            }
-
-            function importMarkFromFile(file) {
-                file.text().then(text => {
-                    const lines = text.split(/\r?\n/)
-                        .map(line => line.trim())
-                        .filter(line => line.length > 0);
-                    const newRanks = [];
-                    lines.forEach(word => {
-                        const item = allData.find(d => d.word.toLowerCase() === word.toLowerCase());
-                        if (item) {
-                            newRanks.push(item.rank);
-                        } else {
-                            console.warn('[NGSL] Import word not found in NGSL:', word);
-                        }
-                    });
-                    markedRanks = new Set(newRanks);
-                    saveLocalMark();
-                    applyDisplay();
-                    render();
-                    showToast('已导入');
-                }).catch(err => {
-                    console.error('[NGSL] Import failed', err);
-                    showToast('导入失败');
-                });
-            }
-
-            // ---------- 事件绑定 ----------
-            function bindEvents() {
-                btnTheme.addEventListener('click', toggleTheme);
-                btnSelectMode.addEventListener('click', () => {
-                    if (selectionMode) {
-                        exitSelectionMode();
-                    } else {
-                        enterSelectionMode();
-                    }
-                });
-                btnExitSelect.addEventListener('click', exitSelectionMode);
-                btnRandomAll.addEventListener('click', () => {
-                    if (selectionMode) exitSelectionMode();
-                    randomMode = 'all';
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                });
-                btnRandomUnknown.addEventListener('click', () => {
-                    if (selectionMode) exitSelectionMode();
-                    randomMode = 'unknown';
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                });
-                btnResetSort.addEventListener('click', () => {
-                    randomMode = null;
-                    sortCol = 'rank';
-                    sortAsc = true;
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                });
-                btnReverse.addEventListener('click', () => {
-                    hideWordMode = !hideWordMode;
-                    render();
-                });
-                btnPagination.addEventListener('click', togglePagination);
-                btnExportMarkGlobal.addEventListener('click', exportMark);
-                btnMarkVisible.addEventListener('click', () => markVisible(true));
-                btnUnmarkVisible.addEventListener('click', () => markVisible(false));
-                btnExportSelection.addEventListener('click', exportMark);
-
-                searchInput.addEventListener('input', debounce(function() {
-                    searchQuery = searchInput.value;
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                }, 300));
-
-                levelFilterEl.addEventListener('change', () => {
-                    levelFilter = levelFilterEl.value;
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                });
-
-                knownFilterSeg.addEventListener('click', (e) => {
-                    const btn = e.target.closest('button[data-known]');
-                    if (!btn) return;
-                    knownFilter = btn.dataset.known;
-                    knownFilterSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentPage = 1;
-                    applyDisplay();
-                    render();
-                });
-
-                prevPageBtn.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        render();
-                    }
-                });
-                nextPageBtn.addEventListener('click', () => {
-                    const totalPages = Math.ceil(displayData.length / PAGE_SIZE);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        render();
-                    }
-                });
-
-                wordGrid.addEventListener('click', (e) => {
-                    const card = e.target.closest('.word-card');
-                    if (!card) return;
-                    const rank = Number(card.dataset.rank);
-                    if (e.target.closest('.mark-check')) return;
-                    if (e.target.closest('.detail-btn')) {
-                        openModal(rank);
-                        return;
-                    }
-                    if (hideWordMode) {
-                        card.classList.toggle('revealed');
-                        return;
-                    }
-                    openModal(rank);
-                });
-
-                wordGrid.addEventListener('change', (e) => {
-                    if (e.target.matches('.mark-check')) {
-                        const rank = Number(e.target.dataset.rank);
-                        if (e.target.checked) {
-                            markedRanks.add(rank);
-                        } else {
-                            markedRanks.delete(rank);
-                        }
-                        saveLocalMark();
-                        updateStats();
-                        updateSelectedCount();
-                    }
-                });
-
-                modalBackdrop.addEventListener('click', closeModal);
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === '/' && document.activeElement !== searchInput) {
-                        e.preventDefault();
-                        searchInput.focus();
-                    }
-                    if (e.key === 'Escape') {
-                        if (!modal.classList.contains('hidden')) {
-                            closeModal();
-                        } else if (selectionMode) {
-                            exitSelectionMode();
-                        }
-                    }
-                });
-
-                importFile.addEventListener('change', () => {
-                    if (importFile.files && importFile.files[0]) {
-                        importMarkFromFile(importFile.files[0]);
-                    }
-                    importFile.value = '';
-                });
-            }
-
-            // ---------- 初始化 ----------
-            async function init() {
-                loadTheme();
-                loadPaginationPreference();
-                loadLocalMark();
-
-                try {
-                    await loadNGSL();
-                } catch (err) {
-                    console.error('[NGSL] Fatal:', err);
-                    wordGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">数据加载失败，请确认 NGSL.json 或 NGSL.csv 存在</div>';
-                    return;
-                }
-
-                if (!hasLocalMark) {
-                    try {
-                        const ranks = await loadUnknown();
-                        markedRanks = new Set(ranks);
-                        saveLocalMark();
-                        console.log('Mark initialized from NGSL_Unknown.txt:', ranks.length, 'words');
-                    } catch (e) {
-                        console.warn('[NGSL] Failed to load NGSL_Unknown.txt, starting with empty mark', e);
-                        markedRanks = new Set();
-                        saveLocalMark();
-                    }
-                    hasLocalMark = true;
-                }
-
-                validateData();
-                applyDisplay();
-                render();
-                bindEvents();
-                console.log('Mark loaded:', markedRanks.size, 'words');
-            }
-
-            init();
-        })();
+            
+            render();
+            bindEvents();
+            
+            console.log('[NGSL] Ready');
+        }
+        
+        init();
+    })();
     </script>
 </body>
 </html>
+
