@@ -41,6 +41,33 @@ NGSL 主数据从服务器加载
 
 NGSL.json
 
+下面是此文件内容的示例：
+[
+  {
+    "Rank": "1",
+    "Word": "the",
+    "Word forms": "",
+    "Pronunciation": "/ði/",
+    "POS": "det",
+    "Definition_ZH": "这",
+    "Definition_EN": "used to refer to something already mentioned",
+    "Level": "A1",
+    "SFI": "87.85",
+    "U Value": "60910"
+  },
+  {
+    "Rank": "2",
+    "Word": "be",
+    "Word forms": "am, are, aren't, been, being, beings, is, isn't, was, wasn't, were, weren't",
+    "Pronunciation": "/bi/",
+    "POS": "verb",
+    "Definition_ZH": "是",
+    "Definition_EN": "To exist; to be alive; used to give information about someone or something",
+    "Level": "A1",
+    "SFI": "86.86",
+    "U Value": "48575"
+  }
+]
 它是固定、只读的 NGSL 1.2 词库数据。
 
 NGSL 1.2 共 2809 个词条，Rank 为：
