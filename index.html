@@ -1,1417 +1,1264 @@
+<html>
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NGSL 1.2 词汇学习工具</title>
-    <style>
-        /* CSS Variables */
-        :root {
-            --bg: #f8f9fa;
-            --bg-secondary: #ffffff;
-            --fg: #2d3436;
-            --fg-secondary: #636e72;
-            --fg-muted: #b2bec3;
-            --accent: #0984e3;
-            --accent-hover: #0769c0;
-            --card-bg: #ffffff;
-            --card-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            --card-hover-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            --border: #e9ecef;
-            --level-a1: #74b9ff;
-            --level-a2: #81ecec;
-            --level-b1: #55efc4;
-            --level-b2: #ffeaa7;
-            --level-c1: #fab1a0;
-            --level-c2: #dfe6e9;
-            --level-unknown: #c8d6e5;
-            --modal-bg: rgba(0,0,0,0.4);
-            --checkbox-border: #dfe6e9;
-            --toast-bg: #2d3436;
-            --input-bg: #ffffff;
-            --input-border: #dfe6e9;
-            --button-secondary: #e9ecef;
-            --button-secondary-hover: #dfe6e9;
-        }
-        
-        [data-theme="dark"] {
-            --bg: #1a1d21;
-            --bg-secondary: #22262b;
-            --fg: #f5f6fa;
-            --fg-secondary: #a4b0be;
-            --fg-muted: #57606f;
-            --accent: #48dbfb;
-            --accent-hover: #0abde3;
-            --card-bg: #22262b;
-            --card-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            --card-hover-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            --border: #343a40;
-            --level-a1: #5f9ea0;
-            --level-a2: #00b894;
-            --level-b1: #26de81;
-            --level-b2: #fed330;
-            --level-c1: #fd9644;
-            --level-c2: #a55eea;
-            --level-unknown: #576574;
-            --modal-bg: rgba(0,0,0,0.7);
-            --toast-bg: #f5f6fa;
-            --input-bg: #2d3436;
-            --input-border: #343a40;
-            --button-secondary: #343a40;
-            --button-secondary-hover: #485460;
-        }
-        
-        /* Reset */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Base */
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            background: var(--bg);
-            color: var(--fg);
-            line-height: 1.6;
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        /* Header */
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: background-color 0.3s;
-        }
-        
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--fg);
-            white-space: nowrap;
-        }
-        
-        .logo span {
-            color: var(--accent);
-        }
-        
-        /* Toolbar */
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-            justify-content: flex-end;
-        }
-        
-        .search-box {
-            position: relative;
-            flex: 1;
-            max-width: 280px;
-            min-width: 150px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.25rem;
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
-            background: var(--input-bg);
-            color: var(--fg);
-            font-size: 0.875rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(9,132,227,0.15);
-        }
-        
-        .search-box::before {
-            content: "";
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--fg-muted);
-            border-radius: 50%;
-            border-top-color: transparent;
-            border-right-color: transparent;
-        }
-        
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.375rem;
-            padding: 0.5rem 0.875rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: var(--button-secondary);
-            color: var(--fg);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--button-secondary-hover);
-        }
-        
-        .btn-secondary.active {
-            background: var(--accent);
-            color: #fff;
-        }
-        
-        .btn-icon {
-            padding: 0.5rem;
-            min-width: 36px;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Main */
-        .main {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-        
-        /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem 1.25rem;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.125rem;
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--fg-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--fg);
-        }
-        
-        /* Filter Bar */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.375rem;
-        }
-        
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        
-        @media (max-width: 480px) {
-            .cards-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-        }
-        
-        /* Card */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative;
-            overflow: hidden;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .card:hover {
-            box-shadow: var(--card-hover-shadow);
-            transform: translateY(-2px);
-        }
-        
-        .card.marked {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(9,132,227,0.05) 100%);
-        }
-        
-        .card-content {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .card-checkbox {
-            flex-shrink: 0;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--checkbox-border);
-            border-radius: 4px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .selection-mode .card-checkbox {
-            display: flex;
-        }
-        
-        .card-checkbox.checked {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-        
-        .card-checkbox.checked::after {
-            content: "";
-            width: 5px;
-            height: 8px;
-            border: 2px solid #fff;
-            border-top: none;
-            border-left: none;
-            transform: rotate(45deg) translateY(-1px);
-        }
-        
-        .card-word-area {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .card-word {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--fg);
-            transition: opacity 0.3s;
-        }
-        
-        .card-word.hidden-word {
-            opacity: 0;
-            user-select: none;
-        }
-        
-        .card-rank {
-            font-size: 0.7rem;
-            color: var(--fg-muted);
-            margin-top: 0.125rem;
-        }
-        
-        .card-level {
-            position: absolute;
-            bottom: 0.5rem;
-            right: 0.75rem;
-            font-size: 0.65rem;
-            font-weight: 500;
-            padding: 0.125rem 0.375rem;
-            border-radius: 4px;
-            opacity: 0.8;
-        }
-        
-        .card-level[data-level="A1"] { background: var(--level-a1); color: #fff; }
-        .card-level[data-level="A2"] { background: var(--level-a2); color: #2d3436; }
-        .card-level[data-level="B1"] { background: var(--level-b1); color: #2d3436; }
-        .card-level[data-level="B2"] { background: var(--level-b2); color: #2d3436; }
-        .card-level[data-level="C1"] { background: var(--level-c1); color: #2d3436; }
-        .card-level[data-level="C2"] { background: var(--level-c2); color: #2d3436; }
-        
-        /* Pagination */
-        .pagination {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-            padding: 1rem;
-        }
-        
-        .page-info {
-            color: var(--fg-secondary);
-            font-size: 0.875rem;
-        }
-        
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--modal-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            max-width: 480px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            transform: scale(0.9) translateY(20px);
-            transition: transform 0.3s;
-        }
-        
-        .modal-overlay.active .modal {
-            transform: scale(1) translateY(0);
-        }
-        
-        .modal-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            padding: 1.5rem 1.5rem 1rem;
-        }
-        
-        .modal-word {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--fg);
-        }
-        
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: var(--button-secondary);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            flex-shrink: 0;
-        }
-        
-        .modal-close:hover {
-            background: var(--button-secondary-hover);
-        }
-        
-        .modal-close::before,
-        .modal-close::after {
-            content: "";
-            position: absolute;
-            width: 14px;
-            height: 2px;
-            background: var(--fg);
-            border-radius: 1px;
-        }
-        
-        .modal-close::before { transform: rotate(45deg); }
-        .modal-close::after { transform: rotate(-45deg); }
-        
-        .modal-body {
-            padding: 0 1.5rem 1.5rem;
-        }
-        
-        .modal-section {
-            margin-bottom: 1rem;
-        }
-        
-        .modal-section:last-child {
-            margin-bottom: 0;
-        }
-        
-        .modal-label {
-            font-size: 0.75rem;
-            color: var(--fg-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        
-        .modal-value {
-            color: var(--fg);
-        }
-        
-        .modal-pos {
-            display: inline-block;
-            padding: 0.25rem 0.625rem;
-            background: var(--button-secondary);
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: var(--fg-secondary);
-        }
-        
-        .modal-def {
-            line-height: 1.5;
-        }
-        
-        .modal-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.875rem;
-            color: var(--fg-secondary);
-        }
-        
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-        }
-        
-        .toast {
-            background: var(--toast-bg);
-            color: var(--bg);
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        
-        [data-theme="dark"] .toast {
-            color: var(--fg);
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Selection Bar */
-        .selection-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 1rem 1.5rem;
-            transform: translateY(100%);
-            transition: transform 0.3s;
-            z-index: 100;
-        }
-        
-        .selection-bar.active {
-            transform: translateY(0);
-        }
-        
-        .selection-bar-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-        
-        .selection-count {
-            font-size: 0.875rem;
-            color: var(--fg-secondary);
-        }
-        
-        .selection-count strong {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .selection-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--fg-secondary);
-        }
-        
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card {
-            animation: fadeIn 0.4s ease forwards;
-        }
-        
-        /* Focus states */
-        .btn:focus-visible,
-        input:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-        
-        /* Print */
-        @media print {
-            .header, .filter-bar, .pagination, .selection-bar, .toast-container {
-                display: none;
-            }
-            .cards-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NGSL 1.2 英语词汇学习工具</title>
+<style>
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --text: #1f2328;
+  --muted: #6b7280;
+  --border: #e1e4e8;
+  --primary: #4c7dff;
+  --primary-soft: #eef3ff;
+  --danger: #d64545;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --modal-bg: rgba(15, 18, 22, 0.45);
+  --toast-bg: #1f2328;
+  --toast-text: #f9fafb;
+}
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --card: #181c23;
+  --text: #e7eaee;
+  --muted: #8a94a3;
+  --border: #2b323d;
+  --primary: #6d95ff;
+  --primary-soft: #1c2434;
+  --danger: #ff7b7b;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --modal-bg: rgba(0, 0, 0, 0.65);
+  --toast-bg: #2a313c;
+  --toast-text: #ffffff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.5;
+  transition: background .3s ease, color .3s ease;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 20px 60px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  letter-spacing: .01em;
+}
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: .85rem;
+}
+.icon-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: border-color .2s ease, background .2s ease;
+}
+.icon-btn:hover { border-color: var(--primary); }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  transition: background .3s ease, border-color .3s ease;
+}
+.btn {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 11px;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--primary); }
+.btn.active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+.btn-small {
+  padding: 5px 9px;
+  font-size: .78rem;
+}
+.select, .search {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: .85rem;
+  outline: none;
+  transition: border-color .2s ease;
+}
+.select:focus, .search:focus { border-color: var(--primary); }
+.search {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+.selection-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 10px 0;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  border-radius: 14px;
+  padding: 8px 12px;
+  color: var(--primary);
+  font-size: .9rem;
+}
+.hidden { display: none !important; }
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: var(--muted);
+  font-size: .82rem;
+  margin: 12px 2px 8px;
+}
+.stats strong { color: var(--text); font-weight: 600; }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: border-color .2s ease, background .2s ease, transform .1s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.card:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.card.is-marked {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+.card-main { flex: 1; min-width: 0; }
+.card-word-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.card-check {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.card-word {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
+  flex: 1;
+}
+.card-word.hidden-word {
+  filter: blur(7px);
+  user-select: none;
+}
+.card-level {
+  font-size: .72rem;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-left: auto;
+  letter-spacing: .02em;
+}
+.level-a1 { color: #7aa373; }
+.level-a2 { color: #85a36f; }
+.level-b1 { color: #a5955f; }
+.level-b2 { color: #a97a5f; }
+.level-c1 { color: #8f6f96; }
+.level-c2 { color: #5f7f99; }
+.level-unknown { color: var(--muted); }
+.card-def {
+  font-size: .88rem;
+  color: var(--text);
+  margin-top: 7px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+.card-meta {
+  margin-top: 8px;
+  font-size: .65rem;
+  color: var(--muted);
+  letter-spacing: .03em;
+}
+.card-detail {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.05rem;
+  padding: 2px 4px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  margin-top: -2px;
+}
+.card-detail:hover { color: var(--primary); background: var(--primary-soft); }
+.empty, .load-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 20px;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+.load-error h2 { margin-top: 0; color: var(--danger); }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.page-btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 10px;
+  width: 36px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: border-color .2s ease, background .2s ease;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--primary); }
+.page-btn:disabled { opacity: .4; cursor: not-allowed; }
+.page-info { color: var(--muted); font-size: .85rem; }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-bg);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 22px 22px 26px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 1.7rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--danger); }
+.modal-word {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 16px;
+  padding-right: 30px;
+  word-break: break-word;
+}
+.modal-field {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .92rem;
+}
+.modal-field:last-child { border-bottom: 0; }
+.modal-label {
+  min-width: 105px;
+  color: var(--muted);
+  font-size: .78rem;
+  flex-shrink: 0;
+}
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: .88rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  z-index: 100;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+@media (max-width: 620px) {
+  .toolbar { gap: 6px; padding: 8px; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .card-word { font-size: 1.3rem; }
+  .modal { padding: 18px; }
+}
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">NGSL <span>1.2</span></div>
-            <div class="toolbar">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="搜索单词或释义..." aria-label="搜索">
-                </div>
-                <button class="btn btn-icon btn-secondary" id="themeToggle" aria-label="切换主题" title="切换主题">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
-                        <circle cx="12" cy="12" r="5"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
-    
-    <main class="main">
-        <div class="stats-bar" id="statsBar">
-            <div class="stat-item">
-                <span class="stat-label">总词数</span>
-                <span class="stat-value" id="totalWords">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">当前显示</span>
-                <span class="stat-value" id="displayWords">-</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">生词数</span>
-                <span class="stat-value" id="markedWords">-</span>
-            </div>
-        </div>
-        
-        <div class="filter-bar">
-            <div class="filter-group">
-                <button class="btn btn-secondary active" data-filter="unknown" id="filterUnknown">仅生词</button>
-                <button class="btn btn-secondary" data-filter="all" id="filterAll">全部</button>
-            </div>
-            <div class="filter-group">
-                <button class="btn btn-secondary" id="randomAll">全部随机</button>
-                <button class="btn btn-secondary" id="randomUnknown">生词随机</button>
-                <button class="btn btn-secondary" id="resetOrder">重置排序</button>
-            </div>
-            <div class="filter-group">
-                <button class="btn btn-secondary" id="toggleSelection">选择</button>
-                <button class="btn btn-secondary" id="toggleHideWord">反转背词</button>
-            </div>
-            <div class="filter-group">
-                <button class="btn btn-secondary" id="togglePagination">分页</button>
-                <button class="btn btn-secondary" id="importBtn">导入</button>
-                <button class="btn btn-secondary" id="exportBtn">导出</button>
-            </div>
-        </div>
-        
-        <div class="cards-grid selection-mode" id="cardsGrid"></div>
-        
-        <div class="pagination" id="pagination"></div>
-    </main>
-    
-    <div class="selection-bar" id="selectionBar">
-        <div class="selection-bar-content">
-            <div class="selection-count">已选择 <strong id="selectedCount">0</strong> 个</div>
-            <div class="selection-actions">
-                <button class="btn btn-primary" id="markSelected">标记</button>
-                <button class="btn btn-secondary" id="unmarkSelected">取消标记</button>
-                <button class="btn btn-secondary" id="exportSelected">导出所选</button>
-                <button class="btn btn-secondary" id="exitSelection">退出选择</button>
-            </div>
-        </div>
+<div class="container">
+  <header>
+    <div>
+      <h1>NGSL 1.2 词汇学习</h1>
+      <p class="subtitle">纯前端 · 本地状态 · Rank 永久唯一</p>
     </div>
-    
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" role="dialog" aria-modal="true">
-            <div class="modal-header">
-                <div class="modal-word" id="modalWord"></div>
-                <button class="modal-close" id="modalClose" aria-label="关闭"></button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-    
-    <div class="toast-container">
-        <div class="toast" id="toast"></div>
-    </div>
-    
-    <input type="file" id="fileInput" accept=".txt" style="display:none">
+    <button id="btn-theme" class="icon-btn" aria-label="切换主题">🌙</button>
+  </header>
 
-    <script>
-    (function() {
-        'use strict';
-        
-        // ========== 常量 ==========
-        const STORAGE_KEY_MARK = 'ngsl_mark_v3';
-        const STORAGE_KEY_THEME = 'ngsl_theme';
-        const STORAGE_KEY_PAGINATION = 'ngsl_pagination_mode';
-        const PAGE_SIZE = 20;
-        const VALID_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-        
-        // ========== 状态 ==========
-        let allData = [];
-        let displayData = [];
-        let markedRanks = new Set();
-        let tempSelectedRanks = new Set();
-        let currentPage = 1;
-        let searchQuery = '';
-        let knownFilter = 'unknown';
-        let paginationEnabled = true;
-        let selectionMode = false;
-        let randomMode = null;
-        let hideWordMode = false;
-        let wordToRank = new Map();
-        
-        // ========== 工具函数 ==========
-        function esc(str) {
-            if (str == null) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+  <section class="toolbar">
+    <button id="btn-filter-unknown" class="btn active">仅生词</button>
+    <button id="btn-filter-all" class="btn">全部</button>
+
+    <select id="level-select" class="select" aria-label="等级筛选">
+      <option value="all">全部等级</option>
+      <option value="A1">A1</option>
+      <option value="A2">A2</option>
+      <option value="B1">B1</option>
+      <option value="B2">B2</option>
+      <option value="C1">C1</option>
+      <option value="C2">C2</option>
+    </select>
+
+    <input id="search-input" class="search" type="search" placeholder="搜索单词 / 释义 / 词形 ( / )" autocomplete="off">
+
+    <button id="btn-random-all" class="btn">全部随机</button>
+    <button id="btn-random-unknown" class="btn">生词随机</button>
+    <button id="btn-reset-sort" class="btn">重置排序</button>
+    <button id="btn-hide-word" class="btn">隐藏单词</button>
+    <button id="btn-pagination-toggle" class="btn">分页：开</button>
+    <button id="btn-selection" class="btn">选择</button>
+    <button id="btn-export" class="btn">导出 Mark</button>
+    <button id="btn-import" class="btn">导入 Mark</button>
+    <input type="file" id="file-input" accept=".txt,text/plain" hidden>
+  </section>
+
+  <section id="selection-toolbar" class="selection-toolbar hidden">
+    <span>已选择 <strong id="selected-count">0</strong> 个</span>
+    <button id="btn-mark-all" class="btn btn-small">标记</button>
+    <button id="btn-unmark-all" class="btn btn-small">取消标记</button>
+    <button id="btn-export-selection" class="btn btn-small">导出所选</button>
+    <button id="btn-exit-selection" class="btn btn-small">退出选择</button>
+  </section>
+
+  <section class="stats">
+    <span>总词数 <strong id="stat-total">0</strong></span>
+    <span>当前显示 <strong id="stat-shown">0</strong></span>
+    <span>生词 <strong id="stat-marked">0</strong></span>
+  </section>
+
+  <main id="cards" class="card-grid"></main>
+  <nav id="pagination" class="pagination"></nav>
+</div>
+
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button id="modal-close" class="modal-close" aria-label="关闭">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- Storage keys ----
+  const LS_MARK = 'ngsl_mark_v3';
+  const LS_THEME = 'ngsl_theme';
+  const LS_PAGINATION = 'ngsl_pagination_mode';
+
+  // ---- Constants ----
+  const VALID_LEVELS = new Set(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+  const PAGE_SIZE = 20;
+
+  // ---- Global state ----
+  let allData = [];
+  let displayData = [];
+  let markedRanks = new Set();
+  let hasLocalMark = false;
+  let currentPage = 1;
+  let sortCol = 'rank';
+  let sortAsc = true;
+  let searchQuery = '';
+  let levelFilter = 'all';
+  let knownFilter = 'unknown';      // 'unknown' | 'all'
+  let paginationEnabled = true;
+  let selectionMode = false;
+  let randomMode = null;            // null | 'all' | 'unknown'
+  let hideWordMode = false;
+  let revealedRanks = new Set();
+  let rankMap = new Map();
+  let wordIndexMap = new Map();
+  let loadError = false;
+
+  // ---- DOM refs ----
+  const cardsEl = document.getElementById('cards');
+  const paginationEl = document.getElementById('pagination');
+  const modalOverlay = document.getElementById('modal-overlay');
+  const modalBody = document.getElementById('modal-body');
+  const modalClose = document.getElementById('modal-close');
+  const toastEl = document.getElementById('toast');
+  const searchInput = document.getElementById('search-input');
+  const fileInput = document.getElementById('file-input');
+
+  // ---- Helper functions ----
+  function esc(str) {
+    return String(str ?? '').replace(/[&<>"']/g, function (m) {
+      switch (m) {
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return m;
+      }
+    });
+  }
+  function escAttr(str) { return esc(str); }
+
+  function showToast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => toastEl.classList.remove('show'), 2000);
+  }
+
+  function debounce(fn, ms) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), ms);
+    };
+  }
+
+  function toNullableNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function toRankNumber(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function normalizeEntryFromObj(obj) {
+    const rank = toRankNumber(obj.rank ?? obj.Rank);
+    const word = String(obj.word ?? obj.Word ?? '').trim();
+    return {
+      rank,
+      word,
+      forms: String(obj.forms ?? obj['Word forms'] ?? ''),
+      pron: String(obj.pron ?? obj.Pronunciation ?? ''),
+      pos: String(obj.pos ?? obj.POS ?? ''),
+      def_zh: String(obj.def_zh ?? obj.Definition_ZH ?? ''),
+      def_en: String(obj.def_en ?? obj.Definition_EN ?? ''),
+      level: String(obj.level ?? obj.Level ?? '').trim(),
+      sfi: toNullableNumber(obj.sfi ?? obj.SFI),
+      u_value: toNullableNumber(obj.u_value ?? obj['U Value'])
+    };
+  }
+
+  function normalizeData(data) {
+    if (!Array.isArray(data)) throw new Error('NGSL data is not an array');
+    const normalized = [];
+    for (let i = 0; i < data.length; i++) {
+      const raw = data[i];
+      if (!raw || typeof raw !== 'object') {
+        console.warn('[NGSL] Invalid entry at index', i, raw);
+        continue;
+      }
+      const entry = normalizeEntryFromObj(raw);
+      if (!Number.isFinite(entry.rank)) {
+        console.warn('[NGSL] Missing/invalid rank at index', i, raw);
+        continue;
+      }
+      if (!entry.word) {
+        console.warn('[NGSL] Missing word at rank', entry.rank);
+        continue;
+      }
+      normalized.push(entry);
+    }
+    return normalized;
+  }
+
+  function normalizeHeader(h) {
+    const lower = h.toLowerCase().trim();
+    if (lower === 'rank') return 'rank';
+    if (lower.includes('word') && lower.includes('form')) return 'forms';
+    if (lower.includes('word')) return 'word';
+    if (lower.includes('pronunciation')) return 'pron';
+    if (lower.includes('pos') || lower.includes('part of speech')) return 'pos';
+    if (lower.includes('definition_zh') || lower.includes('definition zh') || lower.includes('chinese')) return 'def_zh';
+    if (lower.includes('definition_en') || lower.includes('definition en') || lower.includes('english')) return 'def_en';
+    if (lower.includes('level')) return 'level';
+    if (lower.includes('sfi')) return 'sfi';
+    if (lower.includes('u value') || lower.includes('u_value')) return 'u_value';
+    return lower.replace(/[^a-z0-9_]/g, '_');
+  }
+
+  function parseCSV(text) {
+    if (!text) return [];
+    text = text.replace(/^\uFEFF/, '');
+    const rows = [];
+    let field = '';
+    let row = [];
+    let inQuotes = false;
+    let i = 0;
+    const n = text.length;
+
+    while (i < n) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false;
+          i++;
+          continue;
         }
-        
-        function escAttr(str) {
-            if (str == null) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
+        field += c;
+        i++;
+      } else {
+        if (c === '"') { inQuotes = true; i++; continue; }
+        if (c === ',') { row.push(field); field = ''; i++; continue; }
+        if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          i++;
+          row.push(field);
+          field = '';
+          rows.push(row);
+          row = [];
+          continue;
         }
-        
-        function debounce(fn, ms) {
-            let timer = null;
-            return function(...args) {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn.apply(this, args), ms);
-            };
+        field += c;
+        i++;
+      }
+    }
+
+    if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+    if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
+    if (!rows.length) return [];
+
+    const headers = rows[0].map(h => h.trim()).map(normalizeHeader);
+    const out = [];
+    for (let r = 1; r < rows.length; r++) {
+      const cols = rows[r];
+      const obj = {};
+      for (let c = 0; c < headers.length; c++) {
+        obj[headers[c]] = cols[c] ?? '';
+      }
+      out.push(normalizeEntryFromObj(obj));
+    }
+    return out;
+  }
+
+  function shuffle(array) {
+    const a = [...array];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ---- Data access ----
+  function buildRankMap() {
+    rankMap = new Map();
+    for (const e of allData) {
+      if (!rankMap.has(e.rank)) rankMap.set(e.rank, e);
+    }
+  }
+
+  function buildWordIndex() {
+    wordIndexMap = new Map();
+    for (const e of allData) {
+      wordIndexMap.set(e.word.toLowerCase(), e);
+    }
+  }
+
+  function getEntryByRank(rank) { return rankMap.get(Number(rank)); }
+  function findByWord(word) { return wordIndexMap.get(String(word).trim().toLowerCase()); }
+
+  // ---- Storage ----
+  function loadTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem(LS_THEME); } catch (e) {}
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved);
+    } else {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+    }
+  }
+
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem(LS_THEME, theme); } catch (e) {}
+    const btn = document.getElementById('btn-theme');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  function loadPaginationPref() {
+    let saved = null;
+    try { saved = localStorage.getItem(LS_PAGINATION); } catch (e) {}
+    paginationEnabled = saved !== 'unpaginate';
+  }
+
+  function loadLocalMark() {
+    let raw = null;
+    try { raw = localStorage.getItem(LS_MARK); } catch (e) {}
+    if (raw === null) {
+      hasLocalMark = false;
+      markedRanks = new Set();
+      return;
+    }
+    try {
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) throw new Error('mark is not array');
+      markedRanks = new Set(arr.filter(n => Number.isInteger(n) && n > 0));
+      hasLocalMark = true;
+    } catch (e) {
+      console.warn('[NGSL] Local Mark parse failed, will reinitialize from NGSL_Unknown.txt:', e);
+      markedRanks = new Set();
+      hasLocalMark = false;
+    }
+  }
+
+  function saveMark() {
+    try {
+      const arr = [...markedRanks].sort((a, b) => a - b);
+      localStorage.setItem(LS_MARK, JSON.stringify(arr));
+    } catch (e) {
+      console.warn('[NGSL] Failed to save Mark:', e);
+    }
+  }
+
+  // ---- Fetch ----
+  async function fetchText(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return await res.text();
+  }
+
+  async function loadNGSL() {
+    try {
+      const text = await fetchText('./NGSL.json');
+      const data = JSON.parse(text.replace(/^\uFEFF/, ''));
+      allData = normalizeData(data);
+      console.log('[NGSL] Loaded NGSL.json');
+    } catch (jsonError) {
+      console.warn('[NGSL] NGSL.json load failed, trying NGSL.csv:', jsonError);
+      try {
+        const text = await fetchText('./NGSL.csv');
+        allData = parseCSV(text);
+        console.log('[NGSL] Loaded NGSL.csv');
+      } catch (csvError) {
+        console.error('[NGSL] NGSL.csv load failed:', csvError);
+        allData = [];
+        loadError = true;
+      }
+    }
+  }
+
+  async function loadUnknown() {
+    try {
+      const text = await fetchText('./NGSL_Unknown.txt');
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const ranks = [];
+      for (const word of words) {
+        const entry = findByWord(word);
+        if (entry) {
+          ranks.push(entry.rank);
+        } else {
+          console.warn('[NGSL] Unknown word not found in NGSL:', word);
         }
-        
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+      }
+      markedRanks = new Set(ranks);
+      console.log('[NGSL] Initialized Mark from NGSL_Unknown.txt:', markedRanks.size, 'words');
+    } catch (e) {
+      console.warn('[NGSL] Failed to load NGSL_Unknown.txt:', e);
+      markedRanks = new Set();
+    }
+  }
+
+  // ---- Validation ----
+  function validateData() {
+    if (!allData.length) {
+      console.error('[NGSL] No valid NGSL entries loaded.');
+      return;
+    }
+
+    const rankSeen = new Map();
+    const duplicates = [];
+    const missing = [];
+    for (const e of allData) {
+      if (!e.word) console.error('[NGSL] Missing word for rank:', e.rank);
+      if (rankSeen.has(e.rank)) {
+        duplicates.push(e.rank);
+      } else {
+        rankSeen.set(e.rank, e.word);
+      }
+    }
+    for (let r = 1; r <= 2809; r++) {
+      if (!rankSeen.has(r)) missing.push(r);
+    }
+    if (duplicates.length) console.error('[NGSL] Duplicate ranks detected:', duplicates);
+    if (missing.length) {
+      console.error(
+        '[NGSL] Missing ranks:',
+        missing.length > 120 ? missing.slice(0, 120).join(', ') + ` ... and ${missing.length - 120} more` : missing.join(', ')
+      );
+    }
+    if (allData.length !== 2809) {
+      console.warn('[NGSL] Expected 2809 words, got', allData.length);
+    }
+
+    // Level statistics
+    const stats = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, Unknown: 0 };
+    const seenInvalidLevels = new Set();
+    for (const e of allData) {
+      if (VALID_LEVELS.has(e.level)) {
+        stats[e.level] = (stats[e.level] || 0) + 1;
+      } else {
+        stats.Unknown++;
+        if (!seenInvalidLevels.has(e.level)) {
+          console.warn('[NGSL] Unknown level detected:', e.level);
+          seenInvalidLevels.add(e.level);
         }
-        
-        // ========== 数据加载 ==========
-        async function loadNGSL() {
-            try {
-                const res = await fetch('NGSL.json');
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                
-                // 验证数据
-                const rankSet = new Set();
-                const levelStats = {};
-                
-                data.forEach((item, idx) => {
-                    if (item.rank == null) {
-                        console.error('[NGSL] Missing rank at index ' + idx);
-                    }
-                    if (rankSet.has(item.rank)) {
-                        console.error('[NGSL] Duplicate rank: ' + item.rank);
-                    }
-                    rankSet.add(item.rank);
-                    
-                    if (!item.word) {
-                        console.error('[NGSL] Empty word at rank: ' + item.rank);
-                    }
-                    
-                    const level = item.level || 'unknown';
-                    if (!VALID_LEVELS.includes(level)) {
-                        console.warn('[NGSL] Unknown level: ' + level + ' (rank: ' + item.rank + ')');
-                    }
-                    levelStats[level] = (levelStats[level] || 0) + 1;
-                });
-                
-                // 检查连续性
-                const ranks = Array.from(rankSet).sort((a, b) => a - b);
-                if (ranks.length > 0) {
-                    const expected = [];
-                    for (let i = ranks[0]; i <= ranks[ranks.length - 1]; i++) {
-                        if (!rankSet.has(i)) expected.push(i);
-                    }
-                    if (expected.length > 0) {
-                        console.warn('[NGSL] Missing ranks:', expected.slice(0, 10).join(', ') + (expected.length > 10 ? '...' : ''));
-                    }
-                }
-                
-                allData = data;
-                
-                // 建立word到rank的映射
-                wordToRank.clear();
-                data.forEach(item => {
-                    if (item.word) {
-                        wordToRank.set(item.word.toLowerCase().trim(), item.rank);
-                    }
-                });
-                
-                console.log('[NGSL] Loaded: ' + data.length + ' words');
-                console.log('[NGSL] Level statistics:', levelStats);
-                
-                return true;
-            } catch (err) {
-                console.error('[NGSL] Failed to load NGSL.json:', err);
-                showToast('词库加载失败');
-                return false;
-            }
-        }
-        
-        async function loadUnknown() {
-            try {
-                const res = await fetch('NGSL_Unknown.txt');
-                if (!res.ok) {
-                    console.warn('[NGSL] NGSL_Unknown.txt not found, using empty set');
-                    return [];
-                }
-                const text = await res.text();
-                const words = text.split('\n')
-                    .map(w => w.trim())
-                    .filter(w => w.length > 0);
-                
-                console.log('[NGSL] Unknown file loaded: ' + words.length + ' words');
-                return words;
-            } catch (err) {
-                console.error('[NGSL] Failed to load NGSL_Unknown.txt:', err);
-                return [];
-            }
-        }
-        
-        function loadLocalMark() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY_MARK);
-                if (saved) {
-                    const arr = JSON.parse(saved);
-                    if (Array.isArray(arr)) {
-                        markedRanks = new Set(arr);
-                        console.log('[NGSL] Mark loaded: ' + markedRanks.size + ' words');
-                        return true;
-                    }
-                }
-            } catch (err) {
-                console.warn('[NGSL] Failed to parse local mark:', err);
-            }
-            return false;
-        }
-        
-        function saveLocalMark() {
-            try {
-                const arr = Array.from(markedRanks);
-                localStorage.setItem(STORAGE_KEY_MARK, JSON.stringify(arr));
-            } catch (err) {
-                console.error('[NGSL] Failed to save mark:', err);
-            }
-        }
-        
-        function loadTheme() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY_THEME);
-                if (saved) {
-                    document.documentElement.setAttribute('data-theme', saved);
-                    updateThemeIcon(saved);
-                }
-            } catch (err) {
-                console.warn('[NGSL] Failed to load theme:', err);
-            }
-        }
-        
-        function loadPaginationPreference() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY_PAGINATION);
-                if (saved === 'unpaginate') {
-                    paginationEnabled = false;
-                }
-            } catch (err) {
-                console.warn('[NGSL] Failed to load pagination preference:', err);
-            }
-        }
-        
-        function savePaginationPreference() {
-            localStorage.setItem(STORAGE_KEY_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate');
-        }
-        
-        // ========== 显示逻辑 ==========
-        function getDisplayData() {
-            let data = allData.slice();
-            
-            // 搜索过滤
-            if (searchQuery) {
-                const q = searchQuery.toLowerCase();
-                data = data.filter(item => {
-                    if (item.word && item.word.toLowerCase().includes(q)) return true;
-                    if (item.forms && item.forms.toLowerCase().includes(q)) return true;
-                    if (item.def_en && item.def_en.toLowerCase().includes(q)) return true;
-                    if (item.def_zh && item.def_zh.toLowerCase().includes(q)) return true;
-                    return false;
-                });
-            }
-            
-            // 生词过滤
-            if (knownFilter === 'unknown') {
-                data = data.filter(item => markedRanks.has(item.rank));
-            }
-            
-            // 随机
-            if (randomMode === 'all') {
-                data = shuffleArray(data);
-            } else if (randomMode === 'unknown') {
-                data = shuffleArray(data);
-            }
-            
-            return data;
-        }
-        
-        function shuffleArray(arr) {
-            const result = arr.slice();
-            for (let i = result.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [result[i], result[j]] = [result[j], result[i]];
-            }
-            return result;
-        }
-        
-        function render() {
-            displayData = getDisplayData();
-            renderStats();
-            renderCards();
-            renderPagination();
-            updateSelectionBar();
-            updateFilterButtons();
-        }
-        
-        function renderStats() {
-            document.getElementById('totalWords').textContent = allData.length;
-            document.getElementById('displayWords').textContent = displayData.length;
-            document.getElementById('markedWords').textContent = markedRanks.size;
-        }
-        
-        function renderCards() {
-            const grid = document.getElementById('cardsGrid');
-            
-            if (displayData.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">(_EMPTY_)</div><p>没有找到匹配的单词</p></div>';
-                return;
-            }
-            
-            let data = displayData;
-            let startIdx = 0;
-            let endIdx = data.length;
-            
-            if (paginationEnabled && !searchQuery) {
-                startIdx = (currentPage - 1) * PAGE_SIZE;
-                endIdx = Math.min(startIdx + PAGE_SIZE, data.length);
-            }
-            
-            let html = '';
-            for (let i = startIdx; i < endIdx; i++) {
-                const item = data[i];
-                const isMarked = markedRanks.has(item.rank);
-                const isTempSelected = tempSelectedRanks.has(item.rank);
-                const level = VALID_LEVELS.includes(item.level) ? item.level : 'unknown';
-                
-                html += '<div class="card' + (isMarked ? ' marked' : '') + '" data-rank="' + item.rank + '" style="animation-delay:' + ((i - startIdx) * 0.03) + 's">' +
-                    '<div class="card-content">' +
-                        '<div class="card-checkbox' + (isTempSelected ? ' checked' : '') + '"></div>' +
-                        '<div class="card-word-area">' +
-                            '<div class="card-word' + (hideWordMode ? ' hidden-word' : '') + '">' + esc(item.word) + '</div>' +
-                            '<div class="card-rank">#' + item.rank + '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<span class="card-level" data-level="' + escAttr(level) + '">' + esc(level) + '</span>' +
-                '</div>';
-            }
-            
-            grid.innerHTML = html;
-            grid.classList.toggle('selection-mode', selectionMode);
-        }
-        
-        function renderPagination() {
-            const container = document.getElementById('pagination');
-            
-            if (!paginationEnabled || searchQuery || displayData.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            const totalPages = Math.ceil(displayData.length / PAGE_SIZE);
-            
-            if (totalPages <= 1) {
-                container.innerHTML = '<span class="page-info">共 ' + displayData.length + ' 词</span>';
-                return;
-            }
-            
-            let html = '<button class="btn btn-secondary" data-page="prev"' + (currentPage === 1 ? ' disabled' : '') + '>上一页</button>';
-            html += '<span class="page-info"> ' + currentPage + ' / ' + totalPages + ' </span>';
-            html += '<button class="btn btn-secondary" data-page="next"' + (currentPage === totalPages ? ' disabled' : '') + '>下一页</button>';
-            
-            container.innerHTML = html;
-        }
-        
-        function updateSelectionBar() {
-            const bar = document.getElementById('selectionBar');
-            bar.classList.toggle('active', selectionMode);
-            document.getElementById('selectedCount').textContent = tempSelectedRanks.size;
-        }
-        
-        function updateFilterButtons() {
-            document.getElementById('filterUnknown').classList.toggle('active', knownFilter === 'unknown');
-            document.getElementById('filterAll').classList.toggle('active', knownFilter === 'all');
-            document.getElementById('togglePagination').classList.toggle('active', paginationEnabled);
-            document.getElementById('toggleHideWord').classList.toggle('active', hideWordMode);
-        }
-        
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (theme === 'dark') {
-                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-            } else {
-                icon.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-            }
-        }
-        
-        // ========== 详情弹窗 ==========
-        function showDetail(rank) {
-            const item = allData.find(d => d.rank === rank);
-            if (!item) return;
-            
-            document.getElementById('modalWord').textContent = item.word || '';
-            
-            let bodyHtml = '';
-            
-            // POS
-            if (item.pos) {
-                bodyHtml += '<div class="modal-section"><div class="modal-label">词性</div><span class="modal-pos">' + esc(item.pos) + '</span></div>';
-            }
-            
-            // Forms
-            if (item.forms) {
-                bodyHtml += '<div class="modal-section"><div class="modal-label">词形变化</div><div class="modal-value">' + esc(item.forms) + '</div></div>';
-            }
-            
-            // English Definition
-            if (item.def_en) {
-                bodyHtml += '<div class="modal-section"><div class="modal-label">英文释义</div><div class="modal-value modal-def">' + esc(item.def_en) + '</div></div>';
-            }
-            
-            // Pronunciation
-            if (item.pron) {
-                bodyHtml += '<div class="modal-section"><div class="modal-label">发音</div><div class="modal-value">' + esc(item.pron) + '</div></div>';
-            }
-            
-            // Chinese Definition
-            if (item.def_zh) {
-                bodyHtml += '<div class="modal-section"><div class="modal-label">中文释义</div><div class="modal-value modal-def">' + esc(item.def_zh) + '</div></div>';
-            }
-            
-            // Meta
-            const level = VALID_LEVELS.includes(item.level) ? item.level : 'unknown';
-            bodyHtml += '<div class="modal-meta">';
-            bodyHtml += '<span>Level: ' + esc(level) + '</span>';
-            bodyHtml += '<span>Rank: ' + item.rank + '</span>';
-            if (item.sfi != null) bodyHtml += '<span>SFI: ' + item.sfi + '</span>';
-            bodyHtml += '</div>';
-            
-            document.getElementById('modalBody').innerHTML = bodyHtml;
-            document.getElementById('modalOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        // ========== 导入导出 ==========
-        function exportMark() {
-            if (markedRanks.size === 0) {
-                showToast('没有可导出的词');
-                return;
-            }
-            
-            const words = [];
-            markedRanks.forEach(rank => {
-                const item = allData.find(d => d.rank === rank);
-                if (item && item.word) words.push(item.word);
-            });
-            
-            const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Mark.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('已导出 ' + words.length + ' 个词');
-        }
-        
-        function importMark(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const words = text.split('\n')
-                    .map(w => w.trim())
-                    .filter(w => w.length > 0);
-                
-                let imported = 0;
-                let notFound = 0;
-                
-                words.forEach(word => {
-                    const rank = wordToRank.get(word.toLowerCase());
-                    if (rank != null) {
-                        markedRanks.add(rank);
-                        imported++;
-                    } else {
-                        notFound++;
-                        console.warn('[NGSL] Import: word not found:', word);
-                    }
-                });
-                
-                saveLocalMark();
-                render();
-                showToast('已导入 ' + imported + ' 个词' + (notFound > 0 ? '，' + notFound + ' 个未找到' : ''));
-            };
-            reader.readAsText(file);
-        }
-        
-        function exportSelected() {
-            if (tempSelectedRanks.size === 0) {
-                showToast('没有可导出的词');
-                return;
-            }
-            
-            const words = [];
-            tempSelectedRanks.forEach(rank => {
-                const item = allData.find(d => d.rank === rank);
-                if (item && item.word) words.push(item.word);
-            });
-            
-            const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Selected.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('已导出 ' + words.length + ' 个词');
-        }
-        
-        // ========== 事件绑定 ==========
-        function bindEvents() {
-            // 搜索
-            const searchInput = document.getElementById('searchInput');
-            const doSearch = debounce(function() {
-                searchQuery = searchInput.value.trim();
-                currentPage = 1;
-                render();
-            }, 300);
-            searchInput.addEventListener('input', doSearch);
-            
-            // 快捷键
-            document.addEventListener('keydown', function(e) {
-                if (e.key === '/' && document.activeElement !== searchInput) {
-                    e.preventDefault();
-                    searchInput.focus();
-                }
-                if (e.key === 'Escape') {
-                    closeModal();
-                }
-            });
-            
-            // 主题切换
-            document.getElementById('themeToggle').addEventListener('click', function() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem(STORAGE_KEY_THEME, next);
-                updateThemeIcon(next);
-            });
-            
-            // 过滤按钮
-            document.getElementById('filterUnknown').addEventListener('click', function() {
-                knownFilter = 'unknown';
-                currentPage = 1;
-                render();
-            });
-            
-            document.getElementById('filterAll').addEventListener('click', function() {
-                knownFilter = 'all';
-                currentPage = 1;
-                render();
-            });
-            
-            // 随机
-            document.getElementById('randomAll').addEventListener('click', function() {
-                randomMode = 'all';
-                currentPage = 1;
-                render();
-                showToast('已随机排列');
-            });
-            
-            document.getElementById('randomUnknown').addEventListener('click', function() {
-                randomMode = 'unknown';
-                currentPage = 1;
-                render();
-                showToast('已随机排列生词');
-            });
-            
-            document.getElementById('resetOrder').addEventListener('click', function() {
-                randomMode = null;
-                currentPage = 1;
-                render();
-                showToast('已恢复默认排序');
-            });
-            
-            // 选择模式
-            document.getElementById('toggleSelection').addEventListener('click', function() {
-                if (!selectionMode) {
-                    // 进入选择模式时，退出随机
-                    randomMode = null;
-                    selectionMode = true;
-                    tempSelectedRanks = new Set(markedRanks);
-                    currentPage = 1;
-                    render();
-                }
-            });
-            
-            document.getElementById('exitSelection').addEventListener('click', function() {
-                selectionMode = false;
-                tempSelectedRanks.clear();
-                render();
-            });
-            
-            document.getElementById('markSelected').addEventListener('click', function() {
-                tempSelectedRanks.forEach(rank => markedRanks.add(rank));
-                saveLocalMark();
-                selectionMode = false;
-                tempSelectedRanks.clear();
-                render();
-                showToast('已标记');
-            });
-            
-            document.getElementById('unmarkSelected').addEventListener('click', function() {
-                tempSelectedRanks.forEach(rank => markedRanks.delete(rank));
-                saveLocalMark();
-                selectionMode = false;
-                tempSelectedRanks.clear();
-                render();
-                showToast('已取消标记');
-            });
-            
-            document.getElementById('exportSelected').addEventListener('click', exportSelected);
-            
-            // 反转背词
-            document.getElementById('toggleHideWord').addEventListener('click', function() {
-                hideWordMode = !hideWordMode;
-                render();
-            });
-            
-            // 分页
-            document.getElementById('togglePagination').addEventListener('click', function() {
-                paginationEnabled = !paginationEnabled;
-                savePaginationPreference();
-                currentPage = 1;
-                render();
-            });
-            
-            // 分页按钮
-            document.getElementById('pagination').addEventListener('click', function(e) {
-                const btn = e.target.closest('[data-page]');
-                if (!btn) return;
-                const action = btn.dataset.page;
-                const totalPages = Math.ceil(displayData.length / PAGE_SIZE);
-                
-                if (action === 'prev' && currentPage > 1) {
-                    currentPage--;
-                    render();
-                } else if (action === 'next' && currentPage < totalPages) {
-                    currentPage++;
-                    render();
-                }
-            });
-            
-            // 卡片点击
-            document.getElementById('cardsGrid').addEventListener('click', function(e) {
-                const card = e.target.closest('.card');
-                if (!card) return;
-                
-                const rank = parseInt(card.dataset.rank, 10);
-                
-                if (selectionMode) {
-                    // 选择模式：切换选中状态
-                    if (tempSelectedRanks.has(rank)) {
-                        tempSelectedRanks.delete(rank);
-                    } else {
-                        tempSelectedRanks.add(rank);
-                    }
-                    renderCards();
-                    updateSelectionBar();
-                } else {
-                    // 正常模式：显示详情
-                    showDetail(rank);
-                }
-            });
-            
-            // 弹窗关闭
-            document.getElementById('modalClose').addEventListener('click', closeModal);
-            document.getElementById('modalOverlay').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
-            
-            // 导入导出
-            document.getElementById('exportBtn').addEventListener('click', exportMark);
-            
-            document.getElementById('importBtn').addEventListener('click', function() {
-                document.getElementById('fileInput').click();
-            });
-            
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) importMark(file);
-                e.target.value = '';
-            });
-        }
-        
-        // ========== 初始化 ==========
-        async function init() {
-            console.log('[NGSL] Initializing...');
-            
-            loadTheme();
-            loadPaginationPreference();
-            
-            const hasLocalMark = loadLocalMark();
-            
-            const loaded = await loadNGSL();
-            if (!loaded) {
-                showToast('词库加载失败，请刷新页面重试');
-                return;
-            }
-            
-            if (!hasLocalMark) {
-                const unknownWords = await loadUnknown();
-                unknownWords.forEach(word => {
-                    const rank = wordToRank.get(word.toLowerCase());
-                    if (rank != null) {
-                        markedRanks.add(rank);
-                    } else {
-                        console.warn('[NGSL] Unknown word not found in NGSL:', word);
-                    }
-                });
-                saveLocalMark();
-                console.log('[NGSL] Initialized from unknown file: ' + markedRanks.size + ' words');
-            }
-            
-            render();
-            bindEvents();
-            
-            console.log('[NGSL] Ready');
-        }
-        
-        init();
-    })();
-    </script>
+      }
+    }
+    console.log('[NGSL] Level statistics:', stats);
+  }
+
+  // ---- Derived data ----
+  function getPaginateNow() {
+    return paginationEnabled && searchQuery === '';
+  }
+
+  function getBaseData() {
+    let list = allData;
+
+    if (levelFilter !== 'all') {
+      list = list.filter(e => e.level === levelFilter);
+    }
+
+    if (searchQuery) {
+      list = list.filter(e => {
+        const hay = `${e.word} ${e.forms} ${e.def_en} ${e.def_zh}`.toLowerCase();
+        return hay.includes(searchQuery);
+      });
+    }
+
+    if (randomMode === 'all') {
+      // "全部随机" 忽略“仅生词”筛选，只保留等级/搜索条件
+    } else if (randomMode === 'unknown') {
+      list = list.filter(e => markedRanks.has(e.rank));
+    } else if (knownFilter === 'unknown') {
+      list = list.filter(e => markedRanks.has(e.rank));
+    }
+
+    return list;
+  }
+
+  function getDisplayData() {
+    let list = getBaseData();
+
+    if (randomMode === 'all' || randomMode === 'unknown') {
+      list = shuffle(list);
+    } else {
+      list = [...list];
+      if (sortCol === 'rank') {
+        list.sort((a, b) => sortAsc ? a.rank - b.rank : b.rank - a.rank);
+      } else {
+        list.sort((a, b) => (a.word.localeCompare(b.word)) * (sortAsc ? 1 : -1));
+      }
+    }
+
+    return list;
+  }
+
+  // ---- Level helpers ----
+  function levelLabel(entry) {
+    return VALID_LEVELS.has(entry.level) ? entry.level : '?';
+  }
+
+  function levelClass(entry) {
+    return VALID_LEVELS.has(entry.level) ? `level-${entry.level.toLowerCase()}` : 'level-unknown';
+  }
+
+  // ---- Render ----
+  function render() {
+    if (!allData.length || loadError) {
+      renderLoadError();
+      return;
+    }
+
+    displayData = getDisplayData();
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+    const paginateNow = getPaginateNow();
+    const pageData = paginateNow
+      ? displayData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+      : displayData;
+
+    renderStats();
+    renderCards(pageData);
+    renderPagination();
+    renderToolbarState();
+  }
+
+  function renderCards(pageData) {
+    if (!pageData.length) {
+      cardsEl.innerHTML = `<div class="empty">${selectionMode ? '没有单词可选' : '当前没有符合条件的单词'}</div>`;
+      return;
+    }
+
+    let html = '';
+    for (const entry of pageData) {
+      const marked = markedRanks.has(entry.rank);
+      const revealed = revealedRanks.has(entry.rank);
+      const hiddenWord = hideWordMode && !revealed;
+      const level = levelLabel(entry);
+      const lvClass = levelClass(entry);
+      const def = hideWordMode ? (entry.def_en || entry.def_zh || '—') : '';
+
+      html += `
+        <div class="card ${marked ? 'is-marked' : ''}" data-rank="${entry.rank}">
+          <div class="card-main">
+            <div class="card-word-row">
+              ${selectionMode ? `<input type="checkbox" class="card-check" data-rank="${entry.rank}" ${marked ? 'checked' : ''} aria-label="选择 ${escAttr(entry.word)}">` : ''}
+              <span class="card-word ${hiddenWord ? 'hidden-word' : ''}">${esc(entry.word)}</span>
+              <span class="card-level ${lvClass}">${esc(level)}</span>
+            </div>
+            <div class="card-def">${esc(def)}</div>
+            <div class="card-meta">#${entry.rank}</div>
+          </div>
+          <button class="card-detail" data-action="detail" aria-label="查看 ${escAttr(entry.word)} 详情">ℹ</button>
+        </div>
+      `;
+    }
+    cardsEl.innerHTML = html;
+  }
+
+  function renderStats() {
+    const paginateNow = getPaginateNow();
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(currentPage, totalPages);
+    let visibleCount;
+    if (paginateNow) {
+      visibleCount = displayData.length === 0
+        ? 0
+        : Math.min(PAGE_SIZE, Math.max(0, displayData.length - (currentPage - 1) * PAGE_SIZE));
+    } else {
+      visibleCount = displayData.length;
+    }
+    document.getElementById('stat-total').textContent = allData.length;
+    document.getElementById('stat-shown').textContent = visibleCount;
+    document.getElementById('stat-marked').textContent = markedRanks.size;
+  }
+
+  function renderPagination() {
+    if (!getPaginateNow() || displayData.length <= PAGE_SIZE) {
+      paginationEl.innerHTML = '';
+      return;
+    }
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(currentPage, totalPages);
+    paginationEl.innerHTML = `
+      <button class="page-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+      <span class="page-info">${currentPage} / ${totalPages}</span>
+      <button class="page-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>›</button>
+    `;
+  }
+
+  function renderToolbarState() {
+    const setActive = (el, on) => el && el.classList.toggle('active', !!on);
+    setActive(document.getElementById('btn-filter-unknown'), knownFilter === 'unknown' && randomMode !== 'all');
+    setActive(document.getElementById('btn-filter-all'), knownFilter === 'all' && randomMode !== 'all');
+    const lv = document.getElementById('level-select');
+    if (lv) lv.value = levelFilter;
+    setActive(document.getElementById('btn-random-all'), randomMode === 'all');
+    setActive(document.getElementById('btn-random-unknown'), randomMode === 'unknown');
+    setActive(document.getElementById('btn-hide-word'), hideWordMode);
+    setActive(document.getElementById('btn-pagination-toggle'), paginationEnabled);
+    const pagBtn = document.getElementById('btn-pagination-toggle');
+    if (pagBtn) pagBtn.textContent = paginationEnabled ? '分页：开' : '分页：关';
+    setActive(document.getElementById('btn-selection'), selectionMode);
+    document.getElementById('selection-toolbar').classList.toggle('hidden', !selectionMode);
+    document.getElementById('selected-count').textContent = markedRanks.size;
+  }
+
+  function renderLoadError() {
+    cardsEl.innerHTML = `
+      <div class="load-error">
+        <h2>数据加载失败</h2>
+        <p>请确认 NGSL.json 或 NGSL.csv 存在于 index.html 同一目录。</p>
+        <button id="btn-retry" class="btn">重试</button>
+      </div>
+    `;
+    paginationEl.innerHTML = '';
+    document.querySelector('.stats').style.display = 'none';
+  }
+
+  // ---- Detail modal ----
+  function modalHTML(entry) {
+    const levelText = levelLabel(entry);
+    const levelExtra = VALID_LEVELS.has(entry.level) ? '' : ` <span style="color:var(--muted);font-size:.75rem;">(原始: ${esc(entry.level)})</span>`;
+    return `
+      <h2 class="modal-word">${esc(entry.word)}</h2>
+      <div class="modal-field"><span class="modal-label">POS</span>${esc(entry.pos || '—')}</div>
+      <div class="modal-field"><span class="modal-label">Word forms</span>${esc(entry.forms || '—')}</div>
+      <div class="modal-field"><span class="modal-label">English def</span>${esc(entry.def_en || '—')}</div>
+      <div class="modal-field"><span class="modal-label">Pronunciation</span>${esc(entry.pron || '—')}</div>
+      <div class="modal-field"><span class="modal-label">Chinese def</span>${esc(entry.def_zh || '—')}</div>
+      <div class="modal-field"><span class="modal-label">Level</span>${esc(levelText)}${levelExtra}</div>
+      <div class="modal-field"><span class="modal-label">Rank</span>${esc(entry.rank)}</div>
+      <div class="modal-field"><span class="modal-label">SFI</span>${entry.sfi !== null && entry.sfi !== undefined ? esc(entry.sfi) : '—'}</div>
+      <div class="modal-field"><span class="modal-label">U Value</span>${entry.u_value !== null && entry.u_value !== undefined ? esc(entry.u_value) : '—'}</div>
+    `;
+  }
+
+  function openModal(entry) {
+    modalBody.innerHTML = modalHTML(entry);
+    modalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ---- State mutators ----
+  function setKnownFilter(val) {
+    knownFilter = val;
+    randomMode = null;
+    currentPage = 1;
+    render();
+  }
+
+  function setSelectionMode(on) {
+    selectionMode = on;
+    if (on) {
+      randomMode = null;
+      sortCol = 'rank';
+      sortAsc = true;
+      currentPage = 1;
+    }
+    render();
+  }
+
+  function startRandom(mode) {
+    selectionMode = false;
+    randomMode = mode;
+    currentPage = 1;
+    render();
+  }
+
+  function resetSorting() {
+    randomMode = null;
+    sortCol = 'rank';
+    sortAsc = true;
+    currentPage = 1;
+    render();
+  }
+
+  function setMark(rank, on) {
+    if (on) markedRanks.add(rank);
+    else markedRanks.delete(rank);
+    saveMark();
+  }
+
+  function changePage(page) {
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+    render();
+  }
+
+  // ---- Export / Import Mark ----
+  function exportMark() {
+    if (markedRanks.size === 0) {
+      showToast('没有可导出的词');
+      return;
+    }
+    const words = allData
+      .filter(e => markedRanks.has(e.rank))
+      .sort((a, b) => a.rank - b.rank)
+      .map(e => e.word);
+    const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Mark.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已导出');
+  }
+
+  async function importMark(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const foundRanks = [];
+      const notFound = [];
+      for (const word of words) {
+        const entry = findByWord(word);
+        if (entry) foundRanks.push(entry.rank);
+        else notFound.push(word);
+      }
+      if (notFound.length) {
+        console.warn('[NGSL] Import words not found in NGSL:', notFound);
+      }
+      markedRanks = new Set(foundRanks);
+      saveMark();
+      render();
+      showToast(`已导入 ${foundRanks.length} 个生词`);
+    } catch (e) {
+      console.error('[NGSL] Import failed:', e);
+      showToast('导入失败');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  // ---- Event handling ----
+  function handleCardClick(e) {
+    const checkbox = e.target.closest('.card-check');
+    if (checkbox) {
+      const rank = Number(checkbox.dataset.rank);
+      setMark(rank, checkbox.checked);
+      render();
+      return;
+    }
+
+    const detailBtn = e.target.closest('[data-action="detail"]');
+    const card = e.target.closest('.card');
+    if (!card) return;
+
+    const rank = Number(card.dataset.rank);
+    const entry = getEntryByRank(rank);
+    if (!entry) return;
+
+    if (detailBtn) {
+      openModal(entry);
+      return;
+    }
+
+    if (selectionMode) {
+      setMark(rank, !markedRanks.has(rank));
+      render();
+      return;
+    }
+
+    if (hideWordMode) {
+      if (revealedRanks.has(rank)) revealedRanks.delete(rank);
+      else revealedRanks.add(rank);
+      render();
+      return;
+    }
+
+    openModal(entry);
+  }
+
+  function bindEvents() {
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+
+    document.getElementById('btn-filter-unknown').addEventListener('click', () => setKnownFilter('unknown'));
+    document.getElementById('btn-filter-all').addEventListener('click', () => setKnownFilter('all'));
+
+    document.getElementById('level-select').addEventListener('change', (e) => {
+      levelFilter = e.target.value;
+      randomMode = null;
+      currentPage = 1;
+      render();
+    });
+
+    searchInput.addEventListener('input', debounce((e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      currentPage = 1;
+      render();
+    }, 300));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName)) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    document.getElementById('btn-random-all').addEventListener('click', () => startRandom('all'));
+    document.getElementById('btn-random-unknown').addEventListener('click', () => startRandom('unknown'));
+    document.getElementById('btn-reset-sort').addEventListener('click', resetSorting);
+
+    document.getElementById('btn-hide-word').addEventListener('click', () => {
+      hideWordMode = !hideWordMode;
+      if (!hideWordMode) revealedRanks.clear();
+      currentPage = 1;
+      render();
+    });
+
+    document.getElementById('btn-pagination-toggle').addEventListener('click', () => {
+      paginationEnabled = !paginationEnabled;
+      try {
+        localStorage.setItem(LS_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate');
+      } catch (e) {}
+      currentPage = 1;
+      render();
+    });
+
+    document.getElementById('btn-selection').addEventListener('click', () => setSelectionMode(!selectionMode));
+    document.getElementById('btn-exit-selection').addEventListener('click', () => setSelectionMode(false));
+
+    document.getElementById('btn-mark-all').addEventListener('click', () => {
+      for (const e of displayData) markedRanks.add(e.rank);
+      saveMark();
+      render();
+      showToast('已标记');
+    });
+
+    document.getElementById('btn-unmark-all').addEventListener('click', () => {
+      for (const e of displayData) markedRanks.delete(e.rank);
+      saveMark();
+      render();
+      showToast('已取消标记');
+    });
+
+    document.getElementById('btn-export').addEventListener('click', exportMark);
+    document.getElementById('btn-export-selection').addEventListener('click', exportMark);
+    document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', importMark);
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    cardsEl.addEventListener('click', handleCardClick);
+
+    paginationEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.page === 'prev') changePage(currentPage - 1);
+      else if (btn.dataset.page === 'next') changePage(currentPage + 1);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-retry')) window.location.reload();
+    });
+  }
+
+  // ---- Init ----
+  async function init() {
+    loadTheme();
+    loadPaginationPref();
+    loadLocalMark();
+
+    await loadNGSL();
+
+    if (!allData.length || loadError) {
+      renderLoadError();
+      bindEvents();
+      return;
+    }
+
+    buildRankMap();
+    buildWordIndex();
+
+    if (!hasLocalMark) {
+      await loadUnknown();
+      hasLocalMark = true;
+      saveMark();
+    }
+
+    validateData();
+    render();
+    bindEvents();
+
+    console.log('[NGSL] NGSL loaded:', allData.length, 'words');
+    console.log('[NGSL] Mark loaded:', markedRanks.size, 'words');
+  }
+
+  init().catch((e) => {
+    console.error('[NGSL] Init failed:', e);
+    loadError = true;
+    renderLoadError();
+    bindEvents();
+  });
+})();
+</script>
 </body>
 </html>
-
