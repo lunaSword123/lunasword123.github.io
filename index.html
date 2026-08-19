@@ -19,6 +19,8 @@
   --modal-bg: rgba(15, 18, 22, 0.45);
   --toast-bg: #1f2328;
   --toast-text: #f9fafb;
+  --dropdown-bg: var(--card);
+  --dropdown-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 [data-theme="dark"] {
   --bg: #0f1115;
@@ -33,6 +35,8 @@
   --modal-bg: rgba(0, 0, 0, 0.65);
   --toast-bg: #2a313c;
   --toast-text: #ffffff;
+  --dropdown-bg: #1f262f;
+  --dropdown-shadow: 0 8px 20px rgba(0,0,0,0.5);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -87,6 +91,7 @@ h1 {
   padding: 10px 12px;
   box-shadow: var(--shadow);
   transition: background .3s ease, border-color .3s ease;
+  position: relative;
 }
 .btn {
   border: 1px solid var(--border);
@@ -98,6 +103,7 @@ h1 {
   cursor: pointer;
   transition: background .2s ease, border-color .2s ease, color .2s ease;
   white-space: nowrap;
+  position: relative;
 }
 .btn:hover { border-color: var(--primary); }
 .btn.active {
@@ -160,12 +166,13 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 14px 14px 12px;
-  cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   transition: border-color .2s ease, background .2s ease, transform .1s ease;
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  /* 禁止点击卡片本身触发任何操作，但内部按钮和复选框仍可点击 */
+  cursor: default;
 }
 .card:hover {
   border-color: var(--primary);
@@ -194,6 +201,7 @@ h1 {
   line-height: 1.2;
   word-break: break-word;
   flex: 1;
+  /* 点击单词不触发任何操作，但如果是背词模式下的隐藏，点击卡片本身不操作，但隐藏状态由图标控制？这里保留点击卡片不操作，隐藏单词功能仍然通过按钮切换，但卡片点击不显示单词，之前是点击卡片切换reveal，现在取消 */
 }
 .card-word.hidden-word {
   filter: blur(7px);
@@ -234,11 +242,13 @@ h1 {
   border: 0;
   color: var(--muted);
   cursor: pointer;
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   padding: 2px 4px;
   border-radius: 8px;
   flex-shrink: 0;
   margin-top: -2px;
+  transition: color .2s ease, background .2s ease;
+  line-height: 1;
 }
 .card-detail:hover { color: var(--primary); background: var(--primary-soft); }
 .empty, .load-error {
@@ -329,7 +339,82 @@ h1 {
   color: var(--muted);
   font-size: .78rem;
   flex-shrink: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .02em;
 }
+.modal-value {
+  color: var(--text);
+  font-weight: 400;
+  word-break: break-word;
+}
+.modal-value.pronunciation {
+  font-style: italic;
+  color: var(--muted);
+}
+.modal-value.level {
+  font-weight: 600;
+}
+.modal-value.rank {
+  font-family: monospace;
+  font-size: .85rem;
+}
+/* 辅助信息（SFI, U Value）使用更小的字体 */
+.modal-field.aux {
+  font-size: .8rem;
+}
+.modal-field.aux .modal-label {
+  font-size: .7rem;
+}
+
+/* 下拉菜单样式 */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--dropdown-shadow);
+  min-width: 160px;
+  padding: 6px 0;
+  z-index: 20;
+  list-style: none;
+}
+.dropdown-menu.open {
+  display: block;
+}
+.dropdown-menu li {
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: .85rem;
+  white-space: nowrap;
+  color: var(--text);
+  transition: background .15s ease;
+}
+.dropdown-menu li:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.dropdown-menu li:active {
+  background: var(--primary);
+  color: #fff;
+}
+.dropdown-menu li.divider {
+  border-top: 1px solid var(--border);
+  margin: 4px 8px;
+  padding: 0;
+  cursor: default;
+}
+.dropdown-menu li.divider:hover {
+  background: transparent;
+}
+
 .toast {
   position: fixed;
   bottom: 28px;
@@ -352,6 +437,7 @@ h1 {
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
   .card-word { font-size: 1.3rem; }
   .modal { padding: 18px; }
+  .modal-label { min-width: 80px; }
 }
 </style>
 </head>
@@ -386,8 +472,28 @@ h1 {
     <button id="btn-hide-word" class="btn">隐藏单词</button>
     <button id="btn-pagination-toggle" class="btn">分页：开</button>
     <button id="btn-selection" class="btn">选择</button>
-    <button id="btn-export" class="btn">导出 Mark</button>
-    <button id="btn-import" class="btn">导入 Mark</button>
+
+    <!-- 单词表按钮（下拉菜单） -->
+    <div class="dropdown" id="wordlist-dropdown">
+      <button class="btn" id="btn-wordlist">📚 单词表</button>
+      <ul class="dropdown-menu" id="wordlist-menu">
+        <li data-url="NGSL&Means.html">NGSL释义</li>
+        <li data-url="NGSL1.1网页.html">NGSL1.1</li>
+        <li data-url="Oxford3000_CEFR_level[US].pdf">Oxford3000_CEFR</li>
+        <li data-url="雅思核心词汇4000词[分类].pdf">雅思4000词分类</li>
+        <li data-url="高考3500词频表.pdf">高考3500词</li>
+      </ul>
+    </div>
+
+    <!-- 导入/导出合并下拉菜单 -->
+    <div class="dropdown" id="importexport-dropdown">
+      <button class="btn" id="btn-importexport">📥 导入/导出</button>
+      <ul class="dropdown-menu" id="importexport-menu">
+        <li id="menu-export">导出 Mark.txt</li>
+        <li id="menu-import">导入 Mark.txt</li>
+      </ul>
+    </div>
+
     <input type="file" id="file-input" accept=".txt,text/plain" hidden>
   </section>
 
@@ -446,7 +552,7 @@ h1 {
   let selectionMode = false;
   let randomMode = null;            // null | 'all' | 'unknown'
   let hideWordMode = false;
-  let revealedRanks = new Set();
+  let revealedRanks = new Set();    // 用于隐藏单词模式，但点击卡片不再切换，所以这个集合可能不再使用，保留但功能移除
   let rankMap = new Map();
   let wordIndexMap = new Map();
   let loadError = false;
@@ -774,7 +880,6 @@ h1 {
       console.warn('[NGSL] Expected 2809 words, got', allData.length);
     }
 
-    // Level statistics
     const stats = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, Unknown: 0 };
     const seenInvalidLevels = new Set();
     for (const e of allData) {
@@ -811,7 +916,7 @@ h1 {
     }
 
     if (randomMode === 'all') {
-      // "全部随机" 忽略“仅生词”筛选，只保留等级/搜索条件
+      // 全部随机忽略生词筛选
     } else if (randomMode === 'unknown') {
       list = list.filter(e => markedRanks.has(e.rank));
     } else if (knownFilter === 'unknown') {
@@ -895,7 +1000,7 @@ h1 {
             <div class="card-def">${esc(def)}</div>
             <div class="card-meta">#${entry.rank}</div>
           </div>
-          <button class="card-detail" data-action="detail" aria-label="查看 ${escAttr(entry.word)} 详情">ℹ</button>
+          <button class="card-detail" data-action="detail" aria-label="查看 ${escAttr(entry.word)} 详情">📖</button>
         </div>
       `;
     }
@@ -966,17 +1071,19 @@ h1 {
   function modalHTML(entry) {
     const levelText = levelLabel(entry);
     const levelExtra = VALID_LEVELS.has(entry.level) ? '' : ` <span style="color:var(--muted);font-size:.75rem;">(原始: ${esc(entry.level)})</span>`;
+    // 按照用户指定顺序：Word, POS, Chinese def, Word forms, English def, 然后补充其他
     return `
       <h2 class="modal-word">${esc(entry.word)}</h2>
-      <div class="modal-field"><span class="modal-label">POS</span>${esc(entry.pos || '—')}</div>
-      <div class="modal-field"><span class="modal-label">Word forms</span>${esc(entry.forms || '—')}</div>
-      <div class="modal-field"><span class="modal-label">English def</span>${esc(entry.def_en || '—')}</div>
-      <div class="modal-field"><span class="modal-label">Pronunciation</span>${esc(entry.pron || '—')}</div>
-      <div class="modal-field"><span class="modal-label">Chinese def</span>${esc(entry.def_zh || '—')}</div>
-      <div class="modal-field"><span class="modal-label">Level</span>${esc(levelText)}${levelExtra}</div>
-      <div class="modal-field"><span class="modal-label">Rank</span>${esc(entry.rank)}</div>
-      <div class="modal-field"><span class="modal-label">SFI</span>${entry.sfi !== null && entry.sfi !== undefined ? esc(entry.sfi) : '—'}</div>
-      <div class="modal-field"><span class="modal-label">U Value</span>${entry.u_value !== null && entry.u_value !== undefined ? esc(entry.u_value) : '—'}</div>
+      <div class="modal-field"><span class="modal-label">POS</span><span class="modal-value">${esc(entry.pos || '—')}</span></div>
+      <div class="modal-field"><span class="modal-label">Chinese definition</span><span class="modal-value">${esc(entry.def_zh || '—')}</span></div>
+      <div class="modal-field"><span class="modal-label">Word forms</span><span class="modal-value">${esc(entry.forms || '—')}</span></div>
+      <div class="modal-field"><span class="modal-label">English definition</span><span class="modal-value">${esc(entry.def_en || '—')}</span></div>
+      <!-- 辅助信息 -->
+      <div class="modal-field"><span class="modal-label">Pronunciation</span><span class="modal-value pronunciation">${esc(entry.pron || '—')}</span></div>
+      <div class="modal-field"><span class="modal-label">Level</span><span class="modal-value level">${esc(levelText)}${levelExtra}</span></div>
+      <div class="modal-field"><span class="modal-label">Rank</span><span class="modal-value rank">${esc(entry.rank)}</span></div>
+      <div class="modal-field aux"><span class="modal-label">SFI</span><span class="modal-value">${entry.sfi !== null && entry.sfi !== undefined ? esc(entry.sfi) : '—'}</span></div>
+      <div class="modal-field aux"><span class="modal-label">U Value</span><span class="modal-value">${entry.u_value !== null && entry.u_value !== undefined ? esc(entry.u_value) : '—'}</span></div>
     `;
   }
 
@@ -1088,8 +1195,27 @@ h1 {
     }
   }
 
+  // ---- 下拉菜单控制 ----
+  function toggleDropdown(menuId) {
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    // 关闭其他所有菜单
+    document.querySelectorAll('.dropdown-menu').forEach(m => {
+      if (m.id !== menuId) m.classList.remove('open');
+    });
+    menu.classList.toggle('open');
+  }
+
+  // 点击其他区域关闭下拉
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+    }
+  });
+
   // ---- Event handling ----
   function handleCardClick(e) {
+    // 复选框处理
     const checkbox = e.target.closest('.card-check');
     if (checkbox) {
       const rank = Number(checkbox.dataset.rank);
@@ -1098,34 +1224,43 @@ h1 {
       return;
     }
 
+    // 详情按钮处理
     const detailBtn = e.target.closest('[data-action="detail"]');
-    const card = e.target.closest('.card');
-    if (!card) return;
-
-    const rank = Number(card.dataset.rank);
-    const entry = getEntryByRank(rank);
-    if (!entry) return;
-
     if (detailBtn) {
-      openModal(entry);
+      const card = detailBtn.closest('.card');
+      if (!card) return;
+      const rank = Number(card.dataset.rank);
+      const entry = getEntryByRank(rank);
+      if (entry) openModal(entry);
       return;
     }
 
-    if (selectionMode) {
-      setMark(rank, !markedRanks.has(rank));
-      render();
-      return;
-    }
-
-    if (hideWordMode) {
-      if (revealedRanks.has(rank)) revealedRanks.delete(rank);
-      else revealedRanks.add(rank);
-      render();
-      return;
-    }
-
-    openModal(entry);
+    // 点击卡片其他区域不做任何操作
   }
+
+  // 隐藏单词模式：我们不再通过点击卡片切换reveal，因此移除相关逻辑，但保留revealedRanks集合，仅用于在渲染时判断是否显示（但无法通过点击切换，可以保留但功能不再可用）
+  // 用户可以通过再次点击“隐藏单词”按钮切换整个模式的开关，但单个单词的reveal不再支持。为了简化，我们完全移除reveal功能，隐藏单词模式就是全部隐藏或全部显示。
+  // 修改：在隐藏单词模式下，所有单词的显示由hideWordMode统一控制，不再需要revealedRanks。
+  // 所以我们移除revealedRanks的使用，并修改渲染逻辑。
+  // 在renderCards中，原 hiddenWord = hideWordMode && !revealed，改为 hiddenWord = hideWordMode。
+  // 同时移除对revealedRanks的维护。
+  // 我们不再需要点击切换显示，所以删除相关代码。
+  // 但用户说“隐藏单词”模式是背词模式，即隐藏单词显示释义，这仍然通过按钮切换，但不再支持点击单词显示。
+  // 如果用户希望点击卡片显示单词，但之前已经取消，所以就这样。
+
+  // 修改renderCards中的隐藏逻辑：
+  // 将 hiddenWord = hideWordMode && !revealed 改为 hiddenWord = hideWordMode
+  // 并且移除revealedRanks相关操作。
+  // 但我们还要保留def的显示，当hideWordMode为true时，显示释义。
+  // 因为用户希望隐藏单词时显示释义，所以我们保留card-def显示释义。
+  // 好。
+
+  // 重新定义renderCards覆盖原函数
+  // 但为了不重复大段代码，我将在最终代码中直接修改。
+
+  // 我们还需要调整卡片点击事件：因为之前还包含了选择模式下的点击切换标记，现在已移除。
+
+  // 然后绑定事件
 
   function bindEvents() {
     document.getElementById('btn-theme').addEventListener('click', () => {
@@ -1165,7 +1300,7 @@ h1 {
 
     document.getElementById('btn-hide-word').addEventListener('click', () => {
       hideWordMode = !hideWordMode;
-      if (!hideWordMode) revealedRanks.clear();
+      // 不再需要清除revealedRanks，因为我们不再使用
       currentPage = 1;
       render();
     });
@@ -1196,10 +1331,37 @@ h1 {
       showToast('已取消标记');
     });
 
-    document.getElementById('btn-export').addEventListener('click', exportMark);
-    document.getElementById('btn-export-selection').addEventListener('click', exportMark);
-    document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+    // 导出/导入合并菜单
+    document.getElementById('btn-importexport').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown('importexport-menu');
+    });
+    document.getElementById('menu-export').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('importexport-menu').classList.remove('open');
+      exportMark();
+    });
+    document.getElementById('menu-import').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('importexport-menu').classList.remove('open');
+      fileInput.click();
+    });
     fileInput.addEventListener('change', importMark);
+
+    // 单词表下拉菜单
+    document.getElementById('btn-wordlist').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown('wordlist-menu');
+    });
+    document.getElementById('wordlist-menu').addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      const url = li.dataset.url;
+      if (url) {
+        window.open(url, '_blank');
+        document.getElementById('wordlist-menu').classList.remove('open');
+      }
+    });
 
     modalClose.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (e) => {
@@ -1219,6 +1381,43 @@ h1 {
       if (e.target.closest('#btn-retry')) window.location.reload();
     });
   }
+
+  // ---- 覆盖renderCards，使用新的隐藏逻辑 ----
+  // 由于我们在上面定义了renderCards，但实际运行时会被覆盖，我们直接在脚本末尾重新定义
+  // 但我们可以在init之前重新赋值
+  const originalRenderCards = renderCards;
+  renderCards = function(pageData) {
+    if (!pageData.length) {
+      cardsEl.innerHTML = `<div class="empty">${selectionMode ? '没有单词可选' : '当前没有符合条件的单词'}</div>`;
+      return;
+    }
+
+    let html = '';
+    for (const entry of pageData) {
+      const marked = markedRanks.has(entry.rank);
+      const hiddenWord = hideWordMode; // 不再使用revealedRanks
+      const level = levelLabel(entry);
+      const lvClass = levelClass(entry);
+      // 当隐藏单词时，显示释义（如果有）
+      const def = hideWordMode ? (entry.def_en || entry.def_zh || '—') : '';
+
+      html += `
+        <div class="card ${marked ? 'is-marked' : ''}" data-rank="${entry.rank}">
+          <div class="card-main">
+            <div class="card-word-row">
+              ${selectionMode ? `<input type="checkbox" class="card-check" data-rank="${entry.rank}" ${marked ? 'checked' : ''} aria-label="选择 ${escAttr(entry.word)}">` : ''}
+              <span class="card-word ${hiddenWord ? 'hidden-word' : ''}">${esc(entry.word)}</span>
+              <span class="card-level ${lvClass}">${esc(level)}</span>
+            </div>
+            <div class="card-def">${esc(def)}</div>
+            <div class="card-meta">#${entry.rank}</div>
+          </div>
+          <button class="card-detail" data-action="detail" aria-label="查看 ${escAttr(entry.word)} 详情">📖</button>
+        </div>
+      `;
+    }
+    cardsEl.innerHTML = html;
+  };
 
   // ---- Init ----
   async function init() {
