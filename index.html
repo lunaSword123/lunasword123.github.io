@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>词汇学习工具</title>
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --text: #1f2328; --muted: #6b7280;
+  --border: #e1e4e8; --primary: #4c7dff; --primary-soft: #eef3ff;
+  --danger: #d64545; --shadow: 0 8px 24px rgba(0,0,0,.06);
+  --modal-bg: rgba(15,18,22,.45); --toast-bg: #1f2328; --toast-text: #f9fafb;
+  --dropdown-bg: var(--card); --dropdown-shadow: 0 8px 20px rgba(0,0,0,.12);
+}
+[data-theme="dark"] {
+  --bg: #0f1115; --card: #181c23; --text: #e7eaee; --muted: #8a94a3;
+  --border: #2b323d; --primary: #6d95ff; --primary-soft: #1c2434;
+  --danger: #ff7b7b; --shadow: 0 8px 24px rgba(0,0,0,.35);
+  --modal-bg: rgba(0,0,0,.65); --toast-bg: #2a313c; --toast-text: #fff;
+  --dropdown-bg: #1f262f; --dropdown-shadow: 0 8px 20px rgba(0,0,0,.5);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: "Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  line-height: 1.5; transition: background .3s ease, color .3s ease;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 18px 20px 60px; }
+
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 16px;
+}
+h1 { font-size: 1.4rem; margin: 0; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.icon-btn {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 8px 12px; font-size: 1.1rem; cursor: pointer; color: var(--text);
+  transition: border-color .2s ease; line-height: 1;
+}
+.icon-btn:hover { border-color: var(--primary); }
+
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 10px 12px; box-shadow: var(--shadow);
+  transition: background .3s ease, border-color .3s ease; position: relative;
+}
+.btn {
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  border-radius: 10px; padding: 7px 11px; font-size: .85rem; cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--primary); }
+.btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.btn-small { padding: 5px 9px; font-size: .78rem; }
+.search {
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  border-radius: 10px; padding: 7px 10px; font-size: .85rem; outline: none;
+  flex: 1 1 180px; min-width: 160px; transition: border-color .2s ease;
+}
+.search:focus { border-color: var(--primary); }
+
+.selection-toolbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin: 10px 0; background: var(--primary-soft); border: 1px solid var(--primary);
+  border-radius: 14px; padding: 8px 12px; color: var(--primary); font-size: .9rem;
+}
+.hidden { display: none !important; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: .82rem; margin: 12px 2px 8px; }
+.stats strong { color: var(--text); font-weight: 600; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; margin-top: 12px;
+}
+.card {
+  position: relative; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.03);
+  transition: border-color .2s ease, background .2s ease, transform .1s ease;
+  display: flex; align-items: center; gap: 10px; min-height: 56px;
+}
+.card:hover { border-color: var(--primary); transform: translateY(-1px); }
+.card.is-marked { border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); }
+.card-check { flex-shrink: 0; width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; }
+.card-word {
+  flex: 1; min-width: 0; font-size: 1.3rem; font-weight: 600;
+  line-height: 1.3; cursor: pointer; word-break: break-word;
+  overflow-wrap: anywhere; transition: color .15s ease;
+}
+.card-word:hover { color: var(--primary); }
+.card-word.hidden-word { filter: blur(7px); user-select: none; }
+
+.empty, .load-error {
+  grid-column: 1 / -1; text-align: center; color: var(--muted);
+  padding: 40px 20px; background: var(--card);
+  border: 1px dashed var(--border); border-radius: 16px;
+}
+.load-error h2 { margin-top: 0; color: var(--danger); }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 18px; }
+.page-btn {
+  border: 1px solid var(--border); background: var(--card); color: var(--text);
+  border-radius: 10px; width: 36px; height: 34px; cursor: pointer;
+  font-size: 1.1rem; transition: border-color .2s ease;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--primary); }
+.page-btn:disabled { opacity: .4; cursor: not-allowed; }
+.page-info { color: var(--muted); font-size: .85rem; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: var(--modal-bg);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px; z-index: 50;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--border); border-radius: 20px;
+  max-width: 520px; width: 100%; max-height: 85vh; overflow-y: auto;
+  padding: 22px; box-shadow: 0 24px 64px rgba(0,0,0,.18); position: relative;
+}
+.modal-close {
+  position: absolute; top: 12px; right: 14px;
+  background: transparent; border: 0; color: var(--muted);
+  font-size: 1.7rem; cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: var(--danger); }
+.modal-word { font-size: 2rem; font-weight: 800; margin: 0 0 16px; padding-right: 30px; word-break: break-word; }
+.modal-field {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .92rem;
+}
+.modal-field:last-child { border-bottom: 0; }
+.modal-field.aux { font-size: .8rem; }
+.modal-label {
+  min-width: 96px; color: var(--muted); font-size: .75rem;
+  flex-shrink: 0; font-weight: 600;
+}
+.modal-value { color: var(--text); word-break: break-word; flex: 1; }
+.modal-value.pronunciation { font-style: italic; color: var(--muted); }
+.modal-value.multiline { white-space: pre-wrap; }
+
+.dropdown { position: relative; display: inline-block; }
+.dropdown-menu {
+  display: none; position: absolute; top: 110%; right: 0;
+  background: var(--dropdown-bg); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--dropdown-shadow);
+  min-width: 180px; padding: 6px 0; z-index: 20; list-style: none; margin: 0;
+}
+.dropdown-menu.open { display: block; }
+.dropdown-menu li {
+  padding: 7px 16px; cursor: pointer; font-size: .85rem;
+  white-space: nowrap; color: var(--text); transition: background .15s ease;
+}
+.dropdown-menu li:hover { background: var(--primary-soft); color: var(--primary); }
+.dropdown-menu li.divider {
+  border-top: 1px solid var(--border); margin: 4px 8px;
+  padding: 0; cursor: default; height: 0;
+}
+
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: var(--toast-bg); color: var(--toast-text);
+  padding: 10px 18px; border-radius: 999px; font-size: .88rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  z-index: 100; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* 移动端：缩小字号 + 缩小卡片最小宽度，避免长单词"半截掉下来" */
+@media (max-width: 620px) {
+  .container { padding: 12px 12px 48px; }
+  h1 { font-size: 1.15rem; }
+  .toolbar { gap: 6px; padding: 8px; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .card { padding: 10px 12px; min-height: 48px; }
+  .card-word { font-size: 1.05rem; line-height: 1.25; }
+  .modal { padding: 18px; }
+  .modal-word { font-size: 1.5rem; }
+  .modal-label { min-width: 76px; }
+  .stats { gap: 10px; font-size: .75rem; }
+}
+@media (max-width: 400px) {
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .card-word { font-size: .98rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>词汇学习</h1>
+    <div class="header-actions">
+      <div class="dropdown" id="wordlist-dropdown">
+        <button class="icon-btn" id="btn-wordlist" title="词表资源" aria-label="词表资源">📚</button>
+        <ul class="dropdown-menu" id="wordlist-menu">
+          <li data-url="NGSL&Means.html">NGSL 释义</li>
+          <li data-url="NGSL1.1网页.html">NGSL 1.1</li>
+          <li class="divider"></li>
+          <li data-url="Oxford3000_CEFR_level[US].pdf">Oxford 3000 CEFR</li>
+          <li data-url="雅思核心词汇4000词[分类].pdf">雅思核心 4000 词</li>
+          <li data-url="高考3500词频表.pdf">高考 3500 词</li>
+          <li data-url="100个句子3500个高考单词.pdf">100 句 / 3500 高考单词</li>
+        </ul>
+      </div>
+      <button id="btn-theme" class="icon-btn" aria-label="切换主题">🌙</button>
+    </div>
+  </header>
+
+  <section class="toolbar">
+    <button id="btn-filter-unknown" class="btn active">仅生词</button>
+    <button id="btn-filter-all" class="btn">全部</button>
+    <input id="search-input" class="search" type="search" placeholder="搜索单词 / 释义 / 词形 " autocomplete="off">
+    <button id="btn-random-all" class="btn">全部随机</button>
+    <button id="btn-random-unknown" class="btn">生词随机</button>
+    <button id="btn-reset-sort" class="btn">重置排序</button>
+    <button id="btn-hide-word" class="btn">隐藏单词</button>
+    <button id="btn-pagination-toggle" class="btn">分页：开</button>
+    <button id="btn-selection" class="btn">选择</button>
+    <div class="dropdown" id="importexport-dropdown">
+      <button class="btn" id="btn-importexport">📥 导入/导出</button>
+      <ul class="dropdown-menu" id="importexport-menu">
+        <li id="menu-export">导出 Mark.txt</li>
+        <li id="menu-import">导入 Mark.txt</li>
+      </ul>
+    </div>
+    <input type="file" id="file-input" accept=".txt,text/plain" hidden>
+  </section>
+
+  <section id="selection-toolbar" class="selection-toolbar hidden">
+    <span>已选择 <strong id="selected-count">0</strong> 个</span>
+    <button id="btn-mark-all" class="btn btn-small">标记</button>
+    <button id="btn-unmark-all" class="btn btn-small">取消标记</button>
+    <button id="btn-export-selection" class="btn btn-small">导出所选</button>
+    <button id="btn-exit-selection" class="btn btn-small">退出选择</button>
+  </section>
+
+  <section class="stats">
+    <span>当前词表 <strong id="stat-total">0</strong></span>
+    <span>当前显示 <strong id="stat-shown">0</strong></span>
+    <span>生词 <strong id="stat-marked">0</strong></span>
+  </section>
+
+  <main id="cards" class="card-grid"></main>
+  <nav id="pagination" class="pagination"></nav>
+</div>
+
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button id="modal-close" class="modal-close" aria-label="关闭">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+   * 文件路径约定（将来要加词表，在 WORDLISTS 里加一行即可）
+   * ============================================================ */
+  const DATA_FILE = './Dictionary.csv';   // 2 万词总词库（主数据）
+  const WORDLISTS = {
+    ngsl: {
+      label: 'NGSL',
+      list: './NGSL.txt',              // 一行一词，决定显示范围 + 顺序
+      unknown: './NGSL_Unknown.txt'    // 首次初始化生词（可选）
+    }
+  };
+  let currentWordlistKey = 'ngsl';
+
+  /* ============================================================
+   * localStorage keys
+   * 主键语义从 rank 变为 wordID，用新 key 避免误读旧数据
+   * ============================================================ */
+  const LS_MARK = 'wordlist_mark_v1';
+  const LS_THEME = 'ngsl_theme';
+  const LS_PAGINATION = 'ngsl_pagination_mode';
+
+  const PAGE_SIZE = 20;
+
+  /* ---- State ---- */
+  let allData = [];           // 2 万词主库
+  let currentList = [];       // 按 txt 顺序匹配出来的显示范围
+  let displayData = [];       // 筛选/搜索/随机后的当前显示集合
+  let markedRanks = new Set();// 用户 Mark（存 wordID）
+  let hasLocalMark = false;
+  let currentPage = 1;
+  let searchQuery = '';
+  let knownFilter = 'unknown';
+  let paginationEnabled = true;
+  let selectionMode = false;
+  let randomMode = null;      // null | 'all' | 'unknown'
+  let hideWordMode = false;
+  let rankMap = new Map();
+  let wordIndexMap = new Map();
+  let loadError = false;
+
+  /* ---- DOM ---- */
+  const cardsEl = document.getElementById('cards');
+  const paginationEl = document.getElementById('pagination');
+  const modalOverlay = document.getElementById('modal-overlay');
+  const modalBody = document.getElementById('modal-body');
+  const modalClose = document.getElementById('modal-close');
+  const toastEl = document.getElementById('toast');
+  const searchInput = document.getElementById('search-input');
+  const fileInput = document.getElementById('file-input');
+
+  /* ============================================================
+   * Helpers
+   * ============================================================ */
+  function esc(str) {
+    return String(str ?? '').replace(/[&<>"']/g, m => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[m]);
+  }
+  function escAttr(str) { return esc(str); }
+
+  function showToast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+  function debounce(fn, ms) {
+    let t;
+    return function (...args) {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, args), ms);
+    };
+  }
+  function toRankNumber(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  /* 清洗字段：nullTag → 空，字面 \n/\r\n → 真实换行 */
+  function cleanValue(v) {
+    if (v === null || v === undefined) return '';
+    let s = String(v).trim();
+    if (s === '' || s === 'nullTag' || s === 'NULL' || s === 'null') return '';
+    return s.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').trim();
+  }
+
+  /* ============================================================
+   * Normalization（字段映射层）
+   * ============================================================ */
+  function normalizeEntryFromObj(obj) {
+    const rank = toRankNumber(
+      obj.rank ?? obj.Rank ?? obj.wordID ?? obj.wordId ?? obj['Word ID']
+    );
+    const word = String(
+      obj.word ?? obj.Word ?? obj.wordContent ?? obj['Word Content'] ?? ''
+    ).trim();
+    return {
+      rank,
+      word,
+      forms: cleanValue(obj.forms ?? obj['Word forms'] ?? obj.wordExchanges ?? obj['wordExchanges']),
+      pron:  cleanValue(obj.pron  ?? obj.Pronunciation ?? obj.phonetic_US  ?? obj['phonetic_US']),
+      def_zh: cleanValue(obj.def_zh ?? obj.Definition_ZH ?? obj.translation ?? obj['translation']),
+      def_en: cleanValue(obj.def_en ?? obj.Definition_EN ?? obj.definition  ?? obj['definition']),
+      tags:   cleanValue(obj.tags   ?? obj.wordTags ?? obj['wordTags'] ?? obj.level ?? obj.Level)
+    };
+  }
+
+  function normalizeData(data) {
+    if (!Array.isArray(data)) throw new Error('data is not an array');
+    const out = [];
+    for (const raw of data) {
+      if (!raw || typeof raw !== 'object') continue;
+      const e = normalizeEntryFromObj(raw);
+      if (!Number.isFinite(e.rank)) continue;
+      if (!e.word) continue;
+      out.push(e);
+    }
+    return out;
+  }
+
+  function normalizeHeader(h) {
+    const lower = h.toLowerCase().trim();
+    if (lower === 'rank') return 'rank';
+    if (lower === 'wordid' || lower === 'word_id' || lower === 'id') return 'rank';
+    if (lower === 'wordcontent' || lower === 'word_content') return 'word';
+    if (lower === 'word') return 'word';
+    if (lower.includes('exchange') || lower.includes('word form') || lower === 'forms') return 'forms';
+    if (lower.includes('phonetic') || lower.includes('pronunciation') || lower === 'pron') return 'pron';
+    if (lower === 'pos' || lower.includes('part of speech')) return 'pos';
+    if (lower.includes('translation') || lower.includes('definition_zh') || lower.includes('definition zh')) return 'def_zh';
+    if (lower.includes('definition')) return 'def_en';
+    if (lower.includes('tag') || lower.includes('level')) return 'tags';
+    return lower.replace(/[^a-z0-9_]/g, '_');
+  }
+
+  /* ============================================================
+   * 标准 CSV parser（引号、"" 转义、字段内换行、BOM）
+   * ============================================================ */
+  function parseCSV(text) {
+    if (!text) return [];
+    text = text.replace(/^\uFEFF/, '');
+    const rows = [];
+    let field = '', row = [], inQuotes = false, i = 0;
+    const n = text.length;
+
+    while (i < n) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
+        }
+        field += c; i++;
+      } else {
+        if (c === '"') { inQuotes = true; i++; continue; }
+        if (c === ',') { row.push(field); field = ''; i++; continue; }
+        if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          i++;
+          row.push(field); field = '';
+          rows.push(row); row = [];
+          continue;
+        }
+        field += c; i++;
+      }
+    }
+    if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+    if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
+    if (!rows.length) return [];
+
+    const headers = rows[0].map(h => h.trim()).map(normalizeHeader);
+    const out = [];
+    for (let r = 1; r < rows.length; r++) {
+      const cols = rows[r];
+      const obj = {};
+      for (let c = 0; c < headers.length; c++) obj[headers[c]] = cols[c] ?? '';
+      out.push(normalizeEntryFromObj(obj));
+    }
+    return out;
+  }
+
+  function shuffle(array) {
+    const a = [...array];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* ============================================================
+   * Indexes
+   * ============================================================ */
+  function buildRankMap() {
+    rankMap = new Map();
+    for (const e of allData) {
+      if (!rankMap.has(e.rank)) rankMap.set(e.rank, e);
+    }
+  }
+  function buildWordIndex() {
+    wordIndexMap = new Map();
+    for (const e of allData) wordIndexMap.set(e.word.toLowerCase(), e);
+  }
+  function getEntryByRank(rank) { return rankMap.get(Number(rank)); }
+  function findByWord(word) { return wordIndexMap.get(String(word).trim().toLowerCase()); }
+
+  /* ============================================================
+   * Storage
+   * ============================================================ */
+  function loadTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem(LS_THEME); } catch (e) {}
+    if (saved === 'dark' || saved === 'light') setTheme(saved);
+    else {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+    }
+  }
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem(LS_THEME, theme); } catch (e) {}
+    const btn = document.getElementById('btn-theme');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  function loadPaginationPref() {
+    let saved = null;
+    try { saved = localStorage.getItem(LS_PAGINATION); } catch (e) {}
+    paginationEnabled = saved !== 'unpaginate';
+  }
+  function loadLocalMark() {
+    let raw = null;
+    try { raw = localStorage.getItem(LS_MARK); } catch (e) {}
+    if (raw === null) { hasLocalMark = false; markedRanks = new Set(); return; }
+    try {
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) throw new Error('mark is not array');
+      markedRanks = new Set(arr.filter(n => Number.isFinite(n) && n > 0));
+      hasLocalMark = true;
+    } catch (e) {
+      console.warn('[Wordlist] Local Mark parse failed:', e);
+      markedRanks = new Set();
+      hasLocalMark = false;
+    }
+  }
+  function saveMark() {
+    try {
+      localStorage.setItem(LS_MARK, JSON.stringify([...markedRanks].sort((a, b) => a - b)));
+    } catch (e) { console.warn('[Wordlist] saveMark failed:', e); }
+  }
+
+  /* ============================================================
+   * Fetch
+   * ============================================================ */
+  async function fetchText(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return await res.text();
+  }
+
+  /* ============================================================
+   * Loading
+   * ============================================================ */
+  async function loadMainData() {
+    try {
+      const text = await fetchText(DATA_FILE);
+      if (text.trim().startsWith('[')) {
+        allData = normalizeData(JSON.parse(text.replace(/^\uFEFF/, '')));
+      } else {
+        allData = parseCSV(text);
+      }
+      console.log('[Wordlist] Main data loaded:', allData.length, 'entries from', DATA_FILE);
+    } catch (e) {
+      console.error('[Wordlist] Main data load failed:', e);
+      allData = [];
+      loadError = true;
+    }
+  }
+
+  /* 按 txt 顺序，从主库挑出显示范围 */
+  async function loadCurrentWordList() {
+    currentList = [];
+    if (!allData.length) return;
+    const cfg = WORDLISTS[currentWordlistKey];
+    if (!cfg) { console.error('[Wordlist] Unknown wordlist key:', currentWordlistKey); return; }
+
+    try {
+      const text = await fetchText(cfg.list);
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const list = [];
+      const notFound = [];
+      for (const word of words) {
+        const entry = findByWord(word);
+        if (entry) list.push(entry);
+        else notFound.push(word);
+      }
+      if (notFound.length) {
+        console.warn('[Wordlist]', cfg.list, '— words not in main data:',
+          notFound.slice(0, 30), notFound.length > 30 ? `... +${notFound.length - 30}` : '');
+      }
+      currentList = list;
+      console.log('[Wordlist] Wordlist "' + cfg.label + '" loaded:', currentList.length, 'entries');
+    } catch (e) {
+      console.error('[Wordlist]', cfg.list, 'load failed:', e);
+      currentList = allData;
+      showToast('词表文件加载失败，已回退为全部词库');
+    }
+  }
+
+  /* 首次初始化：优先 default unknown，失败则把当前词表全标为生词 */
+  async function loadUnknown() {
+    const cfg = WORDLISTS[currentWordlistKey];
+    const unknownFile = cfg ? cfg.unknown : null;
+    if (!unknownFile) {
+      markedRanks = new Set(currentList.map(e => e.rank));
+      return;
+    }
+    try {
+      const text = await fetchText(unknownFile);
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const ranks = [];
+      for (const word of words) {
+        const entry = findByWord(word);
+        if (entry) ranks.push(entry.rank);
+        else console.warn('[Wordlist] Unknown word not found in main data:', word);
+      }
+      markedRanks = new Set(ranks);
+      console.log('[Wordlist] Mark initialized from', unknownFile, ':', markedRanks.size, 'words');
+    } catch (e) {
+      console.warn('[Wordlist]', unknownFile, 'unavailable, marking all current list as unknown');
+      markedRanks = new Set(currentList.map(e => e.rank));
+      showToast('默认生词列表加载失败，已将所有词标记为生词');
+    }
+  }
+
+  /* ============================================================
+   * Validation
+   * ============================================================ */
+  function validateData() {
+    if (!allData.length) { console.error('[Wordlist] No valid entries loaded.'); return; }
+
+    const seen = new Map();
+    const duplicates = [];
+    for (const e of allData) {
+      if (seen.has(e.rank)) duplicates.push(e.rank);
+      else seen.set(e.rank, e.word);
+    }
+    if (duplicates.length) {
+      console.error('[Wordlist] Duplicate IDs:', duplicates.slice(0, 20),
+        duplicates.length > 20 ? `... +${duplicates.length - 20}` : '');
+    }
+    if (!currentList.length) {
+      console.warn('[Wordlist] currentList is empty — check the wordlist txt file');
+    }
+    const tags = {};
+    for (const e of currentList) {
+      const t = e.tags || '(none)';
+      tags[t] = (tags[t] || 0) + 1;
+    }
+    console.log('[Wordlist] Tags statistics (current list):', tags);
+  }
+
+  /* ============================================================
+   * Derived
+   * ============================================================ */
+  function getPaginateNow() { return paginationEnabled && searchQuery === ''; }
+
+  function getBaseData() {
+    let list = currentList;
+    if (searchQuery) {
+      list = list.filter(e => {
+        const hay = `${e.word} ${e.forms} ${e.def_en} ${e.def_zh}`.toLowerCase();
+        return hay.includes(searchQuery);
+      });
+    }
+    if (randomMode === 'all') { /* 忽略生词筛选 */ }
+    else if (randomMode === 'unknown') list = list.filter(e => markedRanks.has(e.rank));
+    else if (knownFilter === 'unknown') list = list.filter(e => markedRanks.has(e.rank));
+    return list;
+  }
+
+  function getDisplayData() {
+    let list = getBaseData();
+    if (randomMode === 'all' || randomMode === 'unknown') return shuffle(list);
+    return list; // 保持 txt 原始顺序
+  }
+
+  /* ============================================================
+   * Render
+   * ============================================================ */
+  function render() {
+    if (!allData.length || loadError) { renderLoadError(); return; }
+
+    displayData = getDisplayData();
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+    const paginateNow = getPaginateNow();
+    const pageData = paginateNow
+      ? displayData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+      : displayData;
+
+    renderStats();
+    renderCards(pageData);
+    renderPagination();
+    renderToolbarState();
+  }
+
+  /* 极简卡片：只有单词（+ 选择模式复选框） */
+  function renderCards(pageData) {
+    if (!pageData.length) {
+      cardsEl.innerHTML = `<div class="empty">${selectionMode ? '没有单词可选' : '当前没有符合条件的单词'}</div>`;
+      return;
+    }
+    let html = '';
+    for (const entry of pageData) {
+      const marked = markedRanks.has(entry.rank);
+      html += `
+        <div class="card ${marked ? 'is-marked' : ''}" data-rank="${entry.rank}">
+          ${selectionMode ? `<input type="checkbox" class="card-check" data-rank="${entry.rank}" ${marked ? 'checked' : ''} aria-label="选择 ${escAttr(entry.word)}">` : ''}
+          <span class="card-word ${hideWordMode ? 'hidden-word' : ''}">${esc(entry.word)}</span>
+        </div>`;
+    }
+    cardsEl.innerHTML = html;
+  }
+
+  function renderStats() {
+    let markedInList = 0;
+    for (const e of currentList) if (markedRanks.has(e.rank)) markedInList++;
+
+    const paginateNow = getPaginateNow();
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(currentPage, totalPages);
+
+    let visibleCount;
+    if (paginateNow) {
+      visibleCount = displayData.length === 0 ? 0
+        : Math.min(PAGE_SIZE, Math.max(0, displayData.length - (currentPage - 1) * PAGE_SIZE));
+    } else visibleCount = displayData.length;
+
+    document.getElementById('stat-total').textContent = currentList.length;
+    document.getElementById('stat-shown').textContent = visibleCount;
+    document.getElementById('stat-marked').textContent = markedInList;
+  }
+
+  function renderPagination() {
+    if (!getPaginateNow() || displayData.length <= PAGE_SIZE) { paginationEl.innerHTML = ''; return; }
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(currentPage, totalPages);
+    paginationEl.innerHTML = `
+      <button class="page-btn" data-page="prev" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+      <span class="page-info">${currentPage} / ${totalPages}</span>
+      <button class="page-btn" data-page="next" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  }
+
+  function renderToolbarState() {
+    const setActive = (el, on) => el && el.classList.toggle('active', !!on);
+    setActive(document.getElementById('btn-filter-unknown'), knownFilter === 'unknown' && randomMode !== 'all');
+    setActive(document.getElementById('btn-filter-all'), knownFilter === 'all' && randomMode !== 'all');
+    setActive(document.getElementById('btn-random-all'), randomMode === 'all');
+    setActive(document.getElementById('btn-random-unknown'), randomMode === 'unknown');
+    setActive(document.getElementById('btn-hide-word'), hideWordMode);
+    setActive(document.getElementById('btn-pagination-toggle'), paginationEnabled);
+    const pagBtn = document.getElementById('btn-pagination-toggle');
+    if (pagBtn) pagBtn.textContent = paginationEnabled ? '分页：开' : '分页：关';
+    setActive(document.getElementById('btn-selection'), selectionMode);
+    document.getElementById('selection-toolbar').classList.toggle('hidden', !selectionMode);
+
+    let markedInList = 0;
+    for (const e of currentList) if (markedRanks.has(e.rank)) markedInList++;
+    document.getElementById('selected-count').textContent = markedInList;
+  }
+
+  function renderLoadError() {
+    cardsEl.innerHTML = `
+      <div class="load-error">
+        <h2>数据加载失败</h2>
+        <p>请确认 Dictionary.csv 与词表文件位于 index.html 同一目录。</p>
+        <button id="btn-retry" class="btn">重试</button>
+      </div>`;
+    paginationEl.innerHTML = '';
+    document.querySelector('.stats').style.display = 'none';
+  }
+
+  /* ============================================================
+   * Detail Modal
+   * ============================================================ */
+  function modalHTML(entry) {
+    const parts = [`<h2 class="modal-word">${esc(entry.word)}</h2>`];
+    if (entry.def_zh) parts.push(`<div class="modal-field"><span class="modal-label">中文释义</span><div class="modal-value multiline">${esc(entry.def_zh)}</div></div>`);
+    if (entry.forms)  parts.push(`<div class="modal-field"><span class="modal-label">词形变化</span><div class="modal-value">${esc(entry.forms)}</div></div>`);
+    if (entry.def_en) parts.push(`<div class="modal-field"><span class="modal-label">English</span><div class="modal-value multiline">${esc(entry.def_en)}</div></div>`);
+    if (entry.pron)   parts.push(`<div class="modal-field"><span class="modal-label">发音</span><div class="modal-value pronunciation">${esc(entry.pron)}</div></div>`);
+    if (entry.tags)   parts.push(`<div class="modal-field aux"><span class="modal-label">标签</span><div class="modal-value">${esc(entry.tags)}</div></div>`);
+    return parts.join('');
+  }
+  function openModal(entry) {
+    modalBody.innerHTML = modalHTML(entry);
+    modalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+  function closeModal() {
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* ============================================================
+   * Mutators
+   * ============================================================ */
+  function setKnownFilter(val) { knownFilter = val; randomMode = null; currentPage = 1; render(); }
+  function setSelectionMode(on) {
+    selectionMode = on;
+    if (on) { randomMode = null; currentPage = 1; }
+    render();
+  }
+  function startRandom(mode) { selectionMode = false; randomMode = mode; currentPage = 1; render(); }
+  function resetSorting() { randomMode = null; currentPage = 1; render(); }
+  function setMark(rank, on) {
+    if (on) markedRanks.add(rank); else markedRanks.delete(rank);
+    saveMark();
+  }
+  function changePage(page) {
+    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+    render();
+  }
+
+  /* ============================================================
+   * Import / Export（只针对当前词表范围）
+   * ============================================================ */
+  function exportMark() {
+    const words = currentList.filter(e => markedRanks.has(e.rank)).map(e => e.word);
+    if (!words.length) { showToast('没有可导出的词'); return; }
+    const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Mark.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已导出 ' + words.length + ' 个');
+  }
+
+  async function importMark(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const inList = new Set(currentList.map(e => e.rank));
+      const found = [];
+      const skipped = [];
+      for (const word of words) {
+        const entry = findByWord(word);
+        if (entry && inList.has(entry.rank)) found.push(entry.rank);
+        else skipped.push(word);
+      }
+      if (skipped.length) console.warn('[Wordlist] Import — skipped (not in current wordlist):', skipped.slice(0, 30));
+      markedRanks = new Set(found);
+      saveMark();
+      render();
+      showToast(`已导入 ${found.length} 个生词`);
+    } catch (e) {
+      console.error('[Wordlist] Import failed:', e);
+      showToast('导入失败');
+    } finally { event.target.value = ''; }
+  }
+
+  /* ============================================================
+   * Dropdown
+   * ============================================================ */
+  function toggleDropdown(menuId) {
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    document.querySelectorAll('.dropdown-menu').forEach(m => {
+      if (m.id !== menuId) m.classList.remove('open');
+    });
+    menu.classList.toggle('open');
+  }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+    }
+  });
+
+  /* ============================================================
+   * Card click → 点单词开详情，复选框改 Mark
+   * ============================================================ */
+  function handleCardClick(e) {
+    const checkbox = e.target.closest('.card-check');
+    if (checkbox) {
+      setMark(Number(checkbox.dataset.rank), checkbox.checked);
+      render();
+      return;
+    }
+    const wordEl = e.target.closest('.card-word');
+    if (wordEl) {
+      const card = wordEl.closest('.card');
+      if (!card) return;
+      const entry = getEntryByRank(Number(card.dataset.rank));
+      if (entry) openModal(entry);
+    }
+  }
+
+  /* ============================================================
+   * Bind
+   * ============================================================ */
+  function bindEvents() {
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    document.getElementById('btn-filter-unknown').addEventListener('click', () => setKnownFilter('unknown'));
+    document.getElementById('btn-filter-all').addEventListener('click', () => setKnownFilter('all'));
+
+    searchInput.addEventListener('input', debounce(e => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      currentPage = 1;
+      render();
+    }, 300));
+
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName)) {
+        e.preventDefault(); searchInput.focus();
+      }
+      if (e.key === 'Escape') closeModal();
+    });
+
+    document.getElementById('btn-random-all').addEventListener('click', () => startRandom('all'));
+    document.getElementById('btn-random-unknown').addEventListener('click', () => startRandom('unknown'));
+    document.getElementById('btn-reset-sort').addEventListener('click', resetSorting);
+
+    document.getElementById('btn-hide-word').addEventListener('click', () => {
+      hideWordMode = !hideWordMode;
+      currentPage = 1;
+      render();
+    });
+
+    document.getElementById('btn-pagination-toggle').addEventListener('click', () => {
+      paginationEnabled = !paginationEnabled;
+      try { localStorage.setItem(LS_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate'); } catch (e) {}
+      currentPage = 1;
+      render();
+    });
+
+    document.getElementById('btn-selection').addEventListener('click', () => setSelectionMode(!selectionMode));
+    document.getElementById('btn-exit-selection').addEventListener('click', () => setSelectionMode(false));
+
+    document.getElementById('btn-mark-all').addEventListener('click', () => {
+      for (const e of displayData) markedRanks.add(e.rank);
+      saveMark(); render(); showToast('已标记');
+    });
+    document.getElementById('btn-unmark-all').addEventListener('click', () => {
+      for (const e of displayData) markedRanks.delete(e.rank);
+      saveMark(); render(); showToast('已取消标记');
+    });
+    document.getElementById('btn-export-selection').addEventListener('click', exportMark);
+
+    document.getElementById('btn-importexport').addEventListener('click', e => {
+      e.stopPropagation(); toggleDropdown('importexport-menu');
+    });
+    document.getElementById('menu-export').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('importexport-menu').classList.remove('open');
+      exportMark();
+    });
+    document.getElementById('menu-import').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('importexport-menu').classList.remove('open');
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', importMark);
+
+    document.getElementById('btn-wordlist').addEventListener('click', e => {
+      e.stopPropagation(); toggleDropdown('wordlist-menu');
+    });
+    document.getElementById('wordlist-menu').addEventListener('click', e => {
+      const li = e.target.closest('li');
+      if (!li || li.classList.contains('divider')) return;
+      const url = li.dataset.url;
+      if (url) {
+        window.open(url, '_blank');
+        document.getElementById('wordlist-menu').classList.remove('open');
+      }
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+
+    cardsEl.addEventListener('click', handleCardClick);
+
+    paginationEl.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.page === 'prev') changePage(currentPage - 1);
+      else if (btn.dataset.page === 'next') changePage(currentPage + 1);
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target.closest('#btn-retry')) window.location.reload();
+    });
+  }
+
+  /* ============================================================
+   * Init
+   * ============================================================ */
+  async function init() {
+    loadTheme();
+    loadPaginationPref();
+    loadLocalMark();
+
+    await loadMainData();
+    if (!allData.length || loadError) { renderLoadError(); bindEvents(); return; }
+
+    buildWordIndex();
+    buildRankMap();
+
+    await loadCurrentWordList();
+
+    if (!hasLocalMark) {
+      await loadUnknown();
+      hasLocalMark = true;
+      saveMark();
+    }
+
+    validateData();
+    render();
+    bindEvents();
+
+    console.log('[Wordlist] Ready. Main:', allData.length,
+      '| Wordlist:', currentList.length, '| Mark:', markedRanks.size);
+  }
+
+  init().catch(e => {
+    console.error('[Wordlist] Init failed:', e);
+    loadError = true;
+    renderLoadError();
+    bindEvents();
+  });
+})();
+</script>
+</body>
+</html>
