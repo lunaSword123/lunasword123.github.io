@@ -28,6 +28,7 @@ body {
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 18px 20px 60px; }
 
+/* header */
 header {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; margin-bottom: 16px;
@@ -36,16 +37,16 @@ h1 { font-size: 1.4rem; margin: 0; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 .icon-btn {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 8px 12px; font-size: 1.1rem; cursor: pointer; color: var(--text);
+  padding: 8px 12px; font-size: 1.15rem; cursor: pointer; color: var(--text);
   transition: border-color .2s ease; line-height: 1;
 }
 .icon-btn:hover { border-color: var(--primary); }
 
+/* toolbar */
 .toolbar {
   display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
   background: var(--card); border: 1px solid var(--border);
   border-radius: 16px; padding: 10px 12px; box-shadow: var(--shadow);
-  transition: background .3s ease, border-color .3s ease; position: relative;
 }
 .btn {
   border: 1px solid var(--border); background: var(--bg); color: var(--text);
@@ -55,24 +56,20 @@ h1 { font-size: 1.4rem; margin: 0; }
 }
 .btn:hover { border-color: var(--primary); }
 .btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
-.btn-small { padding: 5px 9px; font-size: .78rem; }
+.btn[hidden] { display: none !important; }
 .search {
   border: 1px solid var(--border); background: var(--bg); color: var(--text);
   border-radius: 10px; padding: 7px 10px; font-size: .85rem; outline: none;
-  flex: 1 1 180px; min-width: 160px; transition: border-color .2s ease;
+  flex: 1 1 180px; min-width: 140px; transition: border-color .2s ease;
 }
 .search:focus { border-color: var(--primary); }
+.toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 2px; }
 
-.selection-toolbar {
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  margin: 10px 0; background: var(--primary-soft); border: 1px solid var(--primary);
-  border-radius: 14px; padding: 8px 12px; color: var(--primary); font-size: .9rem;
-}
-.hidden { display: none !important; }
-
+/* stats */
 .stats { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: .82rem; margin: 12px 2px 8px; }
 .stats strong { color: var(--text); font-weight: 600; }
 
+/* cards */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -93,7 +90,6 @@ h1 { font-size: 1.4rem; margin: 0; }
   overflow-wrap: anywhere; transition: color .15s ease;
 }
 .card-word:hover { color: var(--primary); }
-.card-word.hidden-word { filter: blur(7px); user-select: none; }
 
 .empty, .load-error {
   grid-column: 1 / -1; text-align: center; color: var(--muted);
@@ -102,6 +98,7 @@ h1 { font-size: 1.4rem; margin: 0; }
 }
 .load-error h2 { margin-top: 0; color: var(--danger); }
 
+/* pagination */
 .pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 18px; }
 .page-btn {
   border: 1px solid var(--border); background: var(--card); color: var(--text);
@@ -112,6 +109,7 @@ h1 { font-size: 1.4rem; margin: 0; }
 .page-btn:disabled { opacity: .4; cursor: not-allowed; }
 .page-info { color: var(--muted); font-size: .85rem; }
 
+/* modal */
 .modal-overlay {
   position: fixed; inset: 0; background: var(--modal-bg);
   display: none; align-items: center; justify-content: center;
@@ -145,24 +143,33 @@ h1 { font-size: 1.4rem; margin: 0; }
 .modal-value.pronunciation { font-style: italic; color: var(--muted); }
 .modal-value.multiline { white-space: pre-wrap; }
 
+/* dropdown */
 .dropdown { position: relative; display: inline-block; }
 .dropdown-menu {
   display: none; position: absolute; top: 110%; right: 0;
   background: var(--dropdown-bg); border: 1px solid var(--border);
   border-radius: 12px; box-shadow: var(--dropdown-shadow);
-  min-width: 180px; padding: 6px 0; z-index: 20; list-style: none; margin: 0;
+  min-width: 200px; padding: 6px 0; z-index: 20; list-style: none; margin: 0;
+  max-height: 70vh; overflow-y: auto;
 }
 .dropdown-menu.open { display: block; }
 .dropdown-menu li {
-  padding: 7px 16px; cursor: pointer; font-size: .85rem;
+  padding: 8px 16px; cursor: pointer; font-size: .87rem;
   white-space: nowrap; color: var(--text); transition: background .15s ease;
 }
 .dropdown-menu li:hover { background: var(--primary-soft); color: var(--primary); }
+.dropdown-menu li.menu-header {
+  padding: 8px 16px 4px; font-size: .72rem; color: var(--muted);
+  font-weight: 700; letter-spacing: .04em; cursor: default;
+}
+.dropdown-menu li.menu-header:hover { background: transparent; color: var(--muted); }
 .dropdown-menu li.divider {
   border-top: 1px solid var(--border); margin: 4px 8px;
   padding: 0; cursor: default; height: 0;
 }
+.dropdown-menu li.divider:hover { background: transparent; }
 
+/* toast */
 .toast {
   position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
   background: var(--toast-bg); color: var(--toast-text);
@@ -173,7 +180,7 @@ h1 { font-size: 1.4rem; margin: 0; }
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 
-/* 移动端：缩小字号 + 缩小卡片最小宽度，避免长单词"半截掉下来" */
+/* mobile */
 @media (max-width: 620px) {
   .container { padding: 12px 12px 48px; }
   h1 { font-size: 1.15rem; }
@@ -185,6 +192,7 @@ h1 { font-size: 1.4rem; margin: 0; }
   .modal-word { font-size: 1.5rem; }
   .modal-label { min-width: 76px; }
   .stats { gap: 10px; font-size: .75rem; }
+  .toolbar-sep { display: none; }
 }
 @media (max-width: 400px) {
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
@@ -197,52 +205,44 @@ h1 { font-size: 1.4rem; margin: 0; }
   <header>
     <h1>词汇学习</h1>
     <div class="header-actions">
-      <div class="dropdown" id="wordlist-dropdown">
-        <button class="icon-btn" id="btn-wordlist" title="词表资源" aria-label="词表资源">📚</button>
-        <ul class="dropdown-menu" id="wordlist-menu">
+      <div class="dropdown">
+        <button class="icon-btn" id="btn-menu" title="菜单" aria-label="菜单">☰</button>
+        <ul class="dropdown-menu" id="menu">
+          <li class="menu-header">词表</li>
+          <li id="menu-import-wordlist">导入词表…</li>
+          <li id="menu-export-wordlist">导出当前词表</li>
+          <li class="menu-header">生词</li>
+          <li id="menu-import-mark">导入生词…</li>
+          <li id="menu-export-mark">导出全部生词</li>
+          <li class="divider"></li>
+          <li id="menu-pagination">分页：开</li>
+          <li id="menu-theme">主题：🌙</li>
+          <li class="divider"></li>
+          <li class="menu-header">词表资源</li>
           <li data-url="NGSL&Means.html">NGSL 释义</li>
           <li data-url="NGSL1.1网页.html">NGSL 1.1</li>
-          <li class="divider"></li>
           <li data-url="Oxford3000_CEFR_level[US].pdf">Oxford 3000 CEFR</li>
           <li data-url="雅思核心词汇4000词[分类].pdf">雅思核心 4000 词</li>
           <li data-url="高考3500词频表.pdf">高考 3500 词</li>
           <li data-url="100个句子3500个高考单词.pdf">100 句 / 3500 高考单词</li>
         </ul>
       </div>
-      <button id="btn-theme" class="icon-btn" aria-label="切换主题">🌙</button>
     </div>
   </header>
 
   <section class="toolbar">
-    <button id="btn-filter-unknown" class="btn active">仅生词</button>
-    <button id="btn-filter-all" class="btn">全部</button>
-    <input id="search-input" class="search" type="search" placeholder="搜索单词 / 释义 / 词形 " autocomplete="off">
+    <button id="btn-view-current" class="btn active">当前词表</button>
+    <button id="btn-view-marked" class="btn">生词</button>
+    <button id="btn-view-dict" class="btn">词典</button>
+    <input id="search-input" class="search" type="search" placeholder="搜索单词 / 释义 / 词形" autocomplete="off">
     <button id="btn-random-all" class="btn">全部随机</button>
-    <button id="btn-random-unknown" class="btn">生词随机</button>
-    <button id="btn-reset-sort" class="btn">重置排序</button>
-    <button id="btn-hide-word" class="btn">隐藏单词</button>
-    <button id="btn-pagination-toggle" class="btn">分页：开</button>
+    <button id="btn-random-marked" class="btn">生词随机</button>
+    <button id="btn-random" class="btn" hidden>随机</button>
     <button id="btn-selection" class="btn">选择</button>
-    <div class="dropdown" id="importexport-dropdown">
-      <button class="btn" id="btn-importexport">📥 导入/导出</button>
-      <ul class="dropdown-menu" id="importexport-menu">
-        <li id="menu-export">导出 Mark.txt</li>
-        <li id="menu-import">导入 Mark.txt</li>
-      </ul>
-    </div>
-    <input type="file" id="file-input" accept=".txt,text/plain" hidden>
-  </section>
-
-  <section id="selection-toolbar" class="selection-toolbar hidden">
-    <span>已选择 <strong id="selected-count">0</strong> 个</span>
-    <button id="btn-mark-all" class="btn btn-small">标记</button>
-    <button id="btn-unmark-all" class="btn btn-small">取消标记</button>
-    <button id="btn-export-selection" class="btn btn-small">导出所选</button>
-    <button id="btn-exit-selection" class="btn btn-small">退出选择</button>
   </section>
 
   <section class="stats">
-    <span>当前词表 <strong id="stat-total">0</strong></span>
+    <span>总词数 <strong id="stat-total">0</strong></span>
     <span>当前显示 <strong id="stat-shown">0</strong></span>
     <span>生词 <strong id="stat-marked">0</strong></span>
   </section>
@@ -260,51 +260,52 @@ h1 { font-size: 1.4rem; margin: 0; }
 
 <div id="toast" class="toast"></div>
 
+<input type="file" id="file-import-wordlist" accept=".txt,text/plain" hidden>
+<input type="file" id="file-import-mark" accept=".txt,text/plain" hidden>
+
 <script>
 (function () {
   'use strict';
 
   /* ============================================================
-   * 文件路径约定（将来要加词表，在 WORDLISTS 里加一行即可）
+   * 文件路径约定
    * ============================================================ */
-  const DATA_FILE = './Dictionary.csv';   // 2 万词总词库（主数据）
-  const WORDLISTS = {
-    ngsl: {
-      label: 'NGSL',
-      list: './NGSL.txt',              // 一行一词，决定显示范围 + 顺序
-      unknown: './NGSL_Unknown.txt'    // 首次初始化生词（可选）
-    }
-  };
-  let currentWordlistKey = 'ngsl';
+  const DATA_FILE = './dictionary.csv';       // 主库（2万词）
+  const DEFAULT_WORDLIST_FILE = './NGSL.txt'; // 默认当前词表
+  const DEFAULT_UNKNOWN_FILE = './NGSL_Unknown.txt';
 
   /* ============================================================
    * localStorage keys
-   * 主键语义从 rank 变为 wordID，用新 key 避免误读旧数据
    * ============================================================ */
   const LS_MARK = 'wordlist_mark_v1';
+  const LS_CURRENT_WORDLIST = 'wordlist_current_v1';
   const LS_THEME = 'ngsl_theme';
   const LS_PAGINATION = 'ngsl_pagination_mode';
 
   const PAGE_SIZE = 20;
 
-  /* ---- State ---- */
-  let allData = [];           // 2 万词主库
-  let currentList = [];       // 按 txt 顺序匹配出来的显示范围
-  let displayData = [];       // 筛选/搜索/随机后的当前显示集合
-  let markedRanks = new Set();// 用户 Mark（存 wordID）
+  /* ============================================================
+   * State
+   * ============================================================ */
+  let allData = [];             // Dictionary.csv 全部
+  let currentList = [];         // 当前词表（默认 NGSL.txt，可被导入替换）
+  let displayData = [];         // 当前渲染结果（筛选/搜索/随机之后）
+  let markedRanks = new Set();  // 全局 Mark（跨词表）
   let hasLocalMark = false;
   let currentPage = 1;
   let searchQuery = '';
-  let knownFilter = 'unknown';
-  let paginationEnabled = true;
+  let viewMode = 'current';     // 'current' | 'marked' | 'dict'
+  let randomMode = null;        // null | 'all' | 'marked'
   let selectionMode = false;
-  let randomMode = null;      // null | 'all' | 'unknown'
-  let hideWordMode = false;
+  let paginationEnabled = true;
+  let shuffledCache = null;     // 随机模式下的稳定快照，翻页不变
   let rankMap = new Map();
   let wordIndexMap = new Map();
   let loadError = false;
 
-  /* ---- DOM ---- */
+  /* ============================================================
+   * DOM
+   * ============================================================ */
   const cardsEl = document.getElementById('cards');
   const paginationEl = document.getElementById('pagination');
   const modalOverlay = document.getElementById('modal-overlay');
@@ -312,7 +313,8 @@ h1 { font-size: 1.4rem; margin: 0; }
   const modalClose = document.getElementById('modal-close');
   const toastEl = document.getElementById('toast');
   const searchInput = document.getElementById('search-input');
-  const fileInput = document.getElementById('file-input');
+  const fileImportWordlist = document.getElementById('file-import-wordlist');
+  const fileImportMark = document.getElementById('file-import-mark');
 
   /* ============================================================
    * Helpers
@@ -342,8 +344,6 @@ h1 { font-size: 1.4rem; margin: 0; }
     const n = Number(v);
     return Number.isFinite(n) ? n : NaN;
   }
-
-  /* 清洗字段：nullTag → 空，字面 \n/\r\n → 真实换行 */
   function cleanValue(v) {
     if (v === null || v === undefined) return '';
     let s = String(v).trim();
@@ -352,7 +352,7 @@ h1 { font-size: 1.4rem; margin: 0; }
   }
 
   /* ============================================================
-   * Normalization（字段映射层）
+   * Normalization
    * ============================================================ */
   function normalizeEntryFromObj(obj) {
     const rank = toRankNumber(
@@ -364,14 +364,13 @@ h1 { font-size: 1.4rem; margin: 0; }
     return {
       rank,
       word,
-      forms: cleanValue(obj.forms ?? obj['Word forms'] ?? obj.wordExchanges ?? obj['wordExchanges']),
-      pron:  cleanValue(obj.pron  ?? obj.Pronunciation ?? obj.phonetic_US  ?? obj['phonetic_US']),
+      forms:  cleanValue(obj.forms ?? obj['Word forms'] ?? obj.wordExchanges ?? obj['wordExchanges']),
+      pron:   cleanValue(obj.pron  ?? obj.Pronunciation ?? obj.phonetic_US ?? obj['phonetic_US']),
       def_zh: cleanValue(obj.def_zh ?? obj.Definition_ZH ?? obj.translation ?? obj['translation']),
       def_en: cleanValue(obj.def_en ?? obj.Definition_EN ?? obj.definition  ?? obj['definition']),
       tags:   cleanValue(obj.tags   ?? obj.wordTags ?? obj['wordTags'] ?? obj.level ?? obj.Level)
     };
   }
-
   function normalizeData(data) {
     if (!Array.isArray(data)) throw new Error('data is not an array');
     const out = [];
@@ -384,7 +383,6 @@ h1 { font-size: 1.4rem; margin: 0; }
     }
     return out;
   }
-
   function normalizeHeader(h) {
     const lower = h.toLowerCase().trim();
     if (lower === 'rank') return 'rank';
@@ -400,16 +398,13 @@ h1 { font-size: 1.4rem; margin: 0; }
     return lower.replace(/[^a-z0-9_]/g, '_');
   }
 
-  /* ============================================================
-   * 标准 CSV parser（引号、"" 转义、字段内换行、BOM）
-   * ============================================================ */
+  /* 标准 CSV（引号、"" 转义、字段内换行、BOM） */
   function parseCSV(text) {
     if (!text) return [];
     text = text.replace(/^\uFEFF/, '');
     const rows = [];
     let field = '', row = [], inQuotes = false, i = 0;
     const n = text.length;
-
     while (i < n) {
       const c = text[i];
       if (inQuotes) {
@@ -434,7 +429,6 @@ h1 { font-size: 1.4rem; margin: 0; }
     if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
     if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
     if (!rows.length) return [];
-
     const headers = rows[0].map(h => h.trim()).map(normalizeHeader);
     const out = [];
     for (let r = 1; r < rows.length; r++) {
@@ -460,9 +454,7 @@ h1 { font-size: 1.4rem; margin: 0; }
    * ============================================================ */
   function buildRankMap() {
     rankMap = new Map();
-    for (const e of allData) {
-      if (!rankMap.has(e.rank)) rankMap.set(e.rank, e);
-    }
+    for (const e of allData) if (!rankMap.has(e.rank)) rankMap.set(e.rank, e);
   }
   function buildWordIndex() {
     wordIndexMap = new Map();
@@ -486,8 +478,7 @@ h1 { font-size: 1.4rem; margin: 0; }
   function setTheme(theme) {
     document.documentElement.dataset.theme = theme;
     try { localStorage.setItem(LS_THEME, theme); } catch (e) {}
-    const btn = document.getElementById('btn-theme');
-    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    updateMenuState();
   }
   function loadPaginationPref() {
     let saved = null;
@@ -500,19 +491,32 @@ h1 { font-size: 1.4rem; margin: 0; }
     if (raw === null) { hasLocalMark = false; markedRanks = new Set(); return; }
     try {
       const arr = JSON.parse(raw);
-      if (!Array.isArray(arr)) throw new Error('mark is not array');
+      if (!Array.isArray(arr)) throw new Error('not array');
       markedRanks = new Set(arr.filter(n => Number.isFinite(n) && n > 0));
       hasLocalMark = true;
     } catch (e) {
-      console.warn('[Wordlist] Local Mark parse failed:', e);
+      console.warn('[Wordlist] Mark parse failed:', e);
       markedRanks = new Set();
       hasLocalMark = false;
     }
   }
   function saveMark() {
+    try { localStorage.setItem(LS_MARK, JSON.stringify([...markedRanks].sort((a, b) => a - b))); }
+    catch (e) { console.warn('[Wordlist] saveMark failed:', e); }
+  }
+  function loadStoredWordlist() {
     try {
-      localStorage.setItem(LS_MARK, JSON.stringify([...markedRanks].sort((a, b) => a - b)));
-    } catch (e) { console.warn('[Wordlist] saveMark failed:', e); }
+      const raw = localStorage.getItem(LS_CURRENT_WORDLIST);
+      if (!raw) return null;
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return null;
+      return arr;
+    } catch (e) { return null; }
+  }
+  function saveStoredWordlist() {
+    try {
+      localStorage.setItem(LS_CURRENT_WORDLIST, JSON.stringify(currentList.map(e => e.word)));
+    } catch (e) { console.warn('[Wordlist] saveStoredWordlist failed:', e); }
   }
 
   /* ============================================================
@@ -530,11 +534,8 @@ h1 { font-size: 1.4rem; margin: 0; }
   async function loadMainData() {
     try {
       const text = await fetchText(DATA_FILE);
-      if (text.trim().startsWith('[')) {
-        allData = normalizeData(JSON.parse(text.replace(/^\uFEFF/, '')));
-      } else {
-        allData = parseCSV(text);
-      }
+      if (text.trim().startsWith('[')) allData = normalizeData(JSON.parse(text.replace(/^\uFEFF/, '')));
+      else allData = parseCSV(text);
       console.log('[Wordlist] Main data loaded:', allData.length, 'entries from', DATA_FILE);
     } catch (e) {
       console.error('[Wordlist] Main data load failed:', e);
@@ -543,112 +544,119 @@ h1 { font-size: 1.4rem; margin: 0; }
     }
   }
 
-  /* 按 txt 顺序，从主库挑出显示范围 */
-  async function loadCurrentWordList() {
-    currentList = [];
-    if (!allData.length) return;
-    const cfg = WORDLISTS[currentWordlistKey];
-    if (!cfg) { console.error('[Wordlist] Unknown wordlist key:', currentWordlistKey); return; }
+  /* 把一批 word 转成 entry 数组（保持 txt 顺序，匹配 Dictionary） */
+  function wordsToEntries(words) {
+    const list = [];
+    const notFound = [];
+    for (const w of words) {
+      const entry = findByWord(w);
+      if (entry) list.push(entry);
+      else notFound.push(w);
+    }
+    return { list, notFound };
+  }
 
-    try {
-      const text = await fetchText(cfg.list);
-      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const list = [];
-      const notFound = [];
-      for (const word of words) {
-        const entry = findByWord(word);
-        if (entry) list.push(entry);
-        else notFound.push(word);
+  async function loadDefaultWordlist() {
+    // 优先用 localStorage 里持久化的（用户导入过的）
+    const stored = loadStoredWordlist();
+    if (stored && stored.length) {
+      const { list, notFound } = wordsToEntries(stored);
+      if (list.length) {
+        currentList = list;
+        console.log('[Wordlist] Current wordlist restored from localStorage:', currentList.length,
+          notFound.length ? `(${notFound.length} not found)` : '');
+        return;
       }
+    }
+    // 否则加载 NGSL.txt
+    try {
+      const text = await fetchText(DEFAULT_WORDLIST_FILE);
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      const { list, notFound } = wordsToEntries(words);
       if (notFound.length) {
-        console.warn('[Wordlist]', cfg.list, '— words not in main data:',
+        console.warn('[Wordlist] Default wordlist — not in Dictionary.csv:',
           notFound.slice(0, 30), notFound.length > 30 ? `... +${notFound.length - 30}` : '');
       }
       currentList = list;
-      console.log('[Wordlist] Wordlist "' + cfg.label + '" loaded:', currentList.length, 'entries');
+      console.log('[Wordlist] Default wordlist loaded:', currentList.length, 'entries from', DEFAULT_WORDLIST_FILE);
     } catch (e) {
-      console.error('[Wordlist]', cfg.list, 'load failed:', e);
-      currentList = allData;
-      showToast('词表文件加载失败，已回退为全部词库');
+      console.error('[Wordlist]', DEFAULT_WORDLIST_FILE, 'load failed:', e);
+      currentList = allData;  // 兜底
+      showToast('默认词表加载失败，已显示全部词库');
     }
   }
 
-  /* 首次初始化：优先 default unknown，失败则把当前词表全标为生词 */
   async function loadUnknown() {
-    const cfg = WORDLISTS[currentWordlistKey];
-    const unknownFile = cfg ? cfg.unknown : null;
-    if (!unknownFile) {
-      markedRanks = new Set(currentList.map(e => e.rank));
-      return;
-    }
     try {
-      const text = await fetchText(unknownFile);
+      const text = await fetchText(DEFAULT_UNKNOWN_FILE);
       const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
       const ranks = [];
-      for (const word of words) {
-        const entry = findByWord(word);
+      for (const w of words) {
+        const entry = findByWord(w);
         if (entry) ranks.push(entry.rank);
-        else console.warn('[Wordlist] Unknown word not found in main data:', word);
+        else console.warn('[Wordlist] Unknown word not found:', w);
       }
       markedRanks = new Set(ranks);
-      console.log('[Wordlist] Mark initialized from', unknownFile, ':', markedRanks.size, 'words');
+      console.log('[Wordlist] Mark initialized from', DEFAULT_UNKNOWN_FILE, ':', markedRanks.size);
     } catch (e) {
-      console.warn('[Wordlist]', unknownFile, 'unavailable, marking all current list as unknown');
+      console.warn('[Wordlist]', DEFAULT_UNKNOWN_FILE, 'unavailable, marking current list as unknown');
       markedRanks = new Set(currentList.map(e => e.rank));
       showToast('默认生词列表加载失败，已将所有词标记为生词');
     }
   }
 
-  /* ============================================================
-   * Validation
-   * ============================================================ */
   function validateData() {
-    if (!allData.length) { console.error('[Wordlist] No valid entries loaded.'); return; }
-
+    if (!allData.length) { console.error('[Wordlist] No valid entries.'); return; }
     const seen = new Map();
-    const duplicates = [];
+    const dups = [];
     for (const e of allData) {
-      if (seen.has(e.rank)) duplicates.push(e.rank);
+      if (seen.has(e.rank)) dups.push(e.rank);
       else seen.set(e.rank, e.word);
     }
-    if (duplicates.length) {
-      console.error('[Wordlist] Duplicate IDs:', duplicates.slice(0, 20),
-        duplicates.length > 20 ? `... +${duplicates.length - 20}` : '');
-    }
-    if (!currentList.length) {
-      console.warn('[Wordlist] currentList is empty — check the wordlist txt file');
-    }
-    const tags = {};
-    for (const e of currentList) {
-      const t = e.tags || '(none)';
-      tags[t] = (tags[t] || 0) + 1;
-    }
-    console.log('[Wordlist] Tags statistics (current list):', tags);
+    if (dups.length) console.error('[Wordlist] Duplicate IDs:', dups.slice(0, 20), dups.length > 20 ? `+${dups.length - 20}` : '');
   }
 
   /* ============================================================
    * Derived
    * ============================================================ */
-  function getPaginateNow() { return paginationEnabled && searchQuery === ''; }
+  function getPaginateNow() {
+    // 词典视图强制分页，避免 2 万词一次性渲染
+    if (viewMode === 'dict') return true;
+    return paginationEnabled && searchQuery === '';
+  }
 
-  function getBaseData() {
-    let list = currentList;
+  function buildSourceList() {
+    if (viewMode === 'current') return currentList;
+    if (viewMode === 'marked') return allData.filter(e => markedRanks.has(e.rank));
+    if (viewMode === 'dict') return allData;
+    return [];
+  }
+
+  function clearShuffledCache() { shuffledCache = null; }
+
+  function getDisplayData() {
+    let list = buildSourceList();
+
+    // 搜索
     if (searchQuery) {
       list = list.filter(e => {
         const hay = `${e.word} ${e.forms} ${e.def_en} ${e.def_zh}`.toLowerCase();
         return hay.includes(searchQuery);
       });
+    } else if (viewMode === 'dict') {
+      // 词典视图无搜索词 → 显示空，提示用户输入
+      return [];
     }
-    if (randomMode === 'all') { /* 忽略生词筛选 */ }
-    else if (randomMode === 'unknown') list = list.filter(e => markedRanks.has(e.rank));
-    else if (knownFilter === 'unknown') list = list.filter(e => markedRanks.has(e.rank));
-    return list;
-  }
 
-  function getDisplayData() {
-    let list = getBaseData();
-    if (randomMode === 'all' || randomMode === 'unknown') return shuffle(list);
-    return list; // 保持 txt 原始顺序
+    // 随机
+    if (randomMode === 'marked' && viewMode === 'current') {
+      list = list.filter(e => markedRanks.has(e.rank));
+    }
+    if (randomMode) {
+      if (!shuffledCache) shuffledCache = shuffle(list);
+      return shuffledCache;
+    }
+    return list;
   }
 
   /* ============================================================
@@ -672,41 +680,52 @@ h1 { font-size: 1.4rem; margin: 0; }
     renderToolbarState();
   }
 
-  /* 极简卡片：只有单词（+ 选择模式复选框） */
+  function shouldShowCheckbox() {
+    if (viewMode === 'marked') return true;
+    if (viewMode === 'current' && selectionMode) return true;
+    return false;
+  }
+
   function renderCards(pageData) {
     if (!pageData.length) {
-      cardsEl.innerHTML = `<div class="empty">${selectionMode ? '没有单词可选' : '当前没有符合条件的单词'}</div>`;
+      let msg;
+      if (viewMode === 'dict' && !searchQuery) msg = '输入关键词搜索词典';
+      else if (viewMode === 'marked') msg = '还没有生词';
+      else if (viewMode === 'dict') msg = '没有匹配的单词';
+      else if (selectionMode) msg = '没有单词可选';
+      else msg = '当前没有符合条件的单词';
+      cardsEl.innerHTML = `<div class="empty">${esc(msg)}</div>`;
       return;
     }
+    const showCheck = shouldShowCheckbox();
     let html = '';
     for (const entry of pageData) {
       const marked = markedRanks.has(entry.rank);
       html += `
         <div class="card ${marked ? 'is-marked' : ''}" data-rank="${entry.rank}">
-          ${selectionMode ? `<input type="checkbox" class="card-check" data-rank="${entry.rank}" ${marked ? 'checked' : ''} aria-label="选择 ${escAttr(entry.word)}">` : ''}
-          <span class="card-word ${hideWordMode ? 'hidden-word' : ''}">${esc(entry.word)}</span>
+          ${showCheck ? `<input type="checkbox" class="card-check" data-rank="${entry.rank}" ${marked ? 'checked' : ''} aria-label="${escAttr(entry.word)}">` : ''}
+          <span class="card-word">${esc(entry.word)}</span>
         </div>`;
     }
     cardsEl.innerHTML = html;
   }
 
   function renderStats() {
-    let markedInList = 0;
-    for (const e of currentList) if (markedRanks.has(e.rank)) markedInList++;
-
-    const paginateNow = getPaginateNow();
-    const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
-    currentPage = Math.min(currentPage, totalPages);
-
-    let visibleCount;
-    if (paginateNow) {
-      visibleCount = displayData.length === 0 ? 0
-        : Math.min(PAGE_SIZE, Math.max(0, displayData.length - (currentPage - 1) * PAGE_SIZE));
-    } else visibleCount = displayData.length;
-
-    document.getElementById('stat-total').textContent = currentList.length;
-    document.getElementById('stat-shown').textContent = visibleCount;
-    document.getElementById('stat-marked').textContent = markedInList;
+    let totalCount, markCount;
+    if (viewMode === 'current') {
+      totalCount = currentList.length;
+      markCount = 0;
+      for (const e of currentList) if (markedRanks.has(e.rank)) markCount++;
+    } else if (viewMode === 'marked') {
+      totalCount = markedRanks.size;
+      markCount = markedRanks.size;
+    } else {
+      totalCount = allData.length;
+      markCount = markedRanks.size;
+    }
+    document.getElementById('stat-total').textContent = totalCount;
+    document.getElementById('stat-shown').textContent = displayData.length;
+    document.getElementById('stat-marked').textContent = markCount;
   }
 
   function renderPagination() {
@@ -720,28 +739,65 @@ h1 { font-size: 1.4rem; margin: 0; }
   }
 
   function renderToolbarState() {
-    const setActive = (el, on) => el && el.classList.toggle('active', !!on);
-    setActive(document.getElementById('btn-filter-unknown'), knownFilter === 'unknown' && randomMode !== 'all');
-    setActive(document.getElementById('btn-filter-all'), knownFilter === 'all' && randomMode !== 'all');
-    setActive(document.getElementById('btn-random-all'), randomMode === 'all');
-    setActive(document.getElementById('btn-random-unknown'), randomMode === 'unknown');
-    setActive(document.getElementById('btn-hide-word'), hideWordMode);
-    setActive(document.getElementById('btn-pagination-toggle'), paginationEnabled);
-    const pagBtn = document.getElementById('btn-pagination-toggle');
-    if (pagBtn) pagBtn.textContent = paginationEnabled ? '分页：开' : '分页：关';
-    setActive(document.getElementById('btn-selection'), selectionMode);
-    document.getElementById('selection-toolbar').classList.toggle('hidden', !selectionMode);
+    const isCurrent = viewMode === 'current';
+    const isMarked = viewMode === 'marked';
+    const isDict = viewMode === 'dict';
 
-    let markedInList = 0;
-    for (const e of currentList) if (markedRanks.has(e.rank)) markedInList++;
-    document.getElementById('selected-count').textContent = markedInList;
+    document.getElementById('btn-view-current').classList.toggle('active', isCurrent);
+    document.getElementById('btn-view-marked').classList.toggle('active', isMarked);
+    document.getElementById('btn-view-dict').classList.toggle('active', isDict);
+
+    const btnRandomAll = document.getElementById('btn-random-all');
+    const btnRandomMarked = document.getElementById('btn-random-marked');
+    const btnRandom = document.getElementById('btn-random');
+    const btnSelection = document.getElementById('btn-selection');
+
+    btnRandomAll.hidden = !isCurrent;
+    btnRandomMarked.hidden = !isCurrent;
+    btnRandom.hidden = !isMarked;
+    btnSelection.hidden = !isCurrent;
+
+    btnRandomAll.classList.toggle('active', isCurrent && randomMode === 'all');
+    btnRandomMarked.classList.toggle('active', isCurrent && randomMode === 'marked');
+    btnRandom.classList.toggle('active', isMarked && randomMode === 'all');
+    btnSelection.classList.toggle('active', isCurrent && selectionMode);
+
+    btnSelection.textContent = selectionMode ? '退出选择' : '选择';
+
+    updateMenuState();
+  }
+
+  function updateMenuState() {
+    const pag = document.getElementById('menu-pagination');
+    if (pag) pag.textContent = '分页：' + (paginationEnabled ? '开' : '关');
+    const theme = document.getElementById('menu-theme');
+    if (theme) theme.textContent = '主题：' + (document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙');
+  }
+
+  function updateStatsOnly() {
+    // 勾/取消时不重渲染卡片，只刷新统计数字
+    let totalCount, markCount;
+    if (viewMode === 'current') {
+      totalCount = currentList.length;
+      markCount = 0;
+      for (const e of currentList) if (markedRanks.has(e.rank)) markCount++;
+    } else if (viewMode === 'marked') {
+      totalCount = markedRanks.size;
+      markCount = markedRanks.size;
+    } else {
+      totalCount = allData.length;
+      markCount = markedRanks.size;
+    }
+    document.getElementById('stat-total').textContent = totalCount;
+    document.getElementById('stat-marked').textContent = markCount;
+    // stat-shown 保持当前渲染时的值
   }
 
   function renderLoadError() {
     cardsEl.innerHTML = `
       <div class="load-error">
         <h2>数据加载失败</h2>
-        <p>请确认 Dictionary.csv 与词表文件位于 index.html 同一目录。</p>
+        <p>请确认 dictionary.csv 与 index.html 同一目录。</p>
         <button id="btn-retry" class="btn">重试</button>
       </div>`;
     paginationEl.innerHTML = '';
@@ -749,7 +805,7 @@ h1 { font-size: 1.4rem; margin: 0; }
   }
 
   /* ============================================================
-   * Detail Modal
+   * Modal
    * ============================================================ */
   function modalHTML(entry) {
     const parts = [`<h2 class="modal-word">${esc(entry.word)}</h2>`];
@@ -774,18 +830,35 @@ h1 { font-size: 1.4rem; margin: 0; }
   /* ============================================================
    * Mutators
    * ============================================================ */
-  function setKnownFilter(val) { knownFilter = val; randomMode = null; currentPage = 1; render(); }
-  function setSelectionMode(on) {
-    selectionMode = on;
-    if (on) { randomMode = null; currentPage = 1; }
+  function setViewMode(mode) {
+    if (mode === viewMode) return;
+    viewMode = mode;
+    randomMode = null;
+    selectionMode = false;
+    currentPage = 1;
+    clearShuffledCache();
     render();
   }
-  function startRandom(mode) { selectionMode = false; randomMode = mode; currentPage = 1; render(); }
-  function resetSorting() { randomMode = null; currentPage = 1; render(); }
+
+  function toggleRandom(mode) {
+    if (randomMode === mode) randomMode = null;
+    else randomMode = mode;
+    clearShuffledCache();
+    currentPage = 1;
+    render();
+  }
+
+  function toggleSelection() {
+    selectionMode = !selectionMode;
+    render();
+  }
+
   function setMark(rank, on) {
-    if (on) markedRanks.add(rank); else markedRanks.delete(rank);
+    if (on) markedRanks.add(rank);
+    else markedRanks.delete(rank);
     saveMark();
   }
+
   function changePage(page) {
     const totalPages = Math.max(1, Math.ceil(displayData.length / PAGE_SIZE));
     currentPage = Math.min(Math.max(1, page), totalPages);
@@ -793,70 +866,106 @@ h1 { font-size: 1.4rem; margin: 0; }
   }
 
   /* ============================================================
-   * Import / Export（只针对当前词表范围）
+   * Import / Export
    * ============================================================ */
-  function exportMark() {
-    const words = currentList.filter(e => markedRanks.has(e.rank)).map(e => e.word);
-    if (!words.length) { showToast('没有可导出的词'); return; }
-    const blob = new Blob([words.join('\n')], { type: 'text/plain;charset=utf-8' });
+  function downloadText(text, filename) {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'Mark.txt';
+    a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('已导出 ' + words.length + ' 个');
   }
 
-  async function importMark(event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
+  async function handleImportWordlist(file) {
     try {
       const text = await file.text();
       const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const inList = new Set(currentList.map(e => e.rank));
-      const found = [];
-      const skipped = [];
-      for (const word of words) {
-        const entry = findByWord(word);
-        if (entry && inList.has(entry.rank)) found.push(entry.rank);
-        else skipped.push(word);
+      if (!words.length) { showToast('文件为空'); return; }
+      const { list, notFound } = wordsToEntries(words);
+      if (!list.length) {
+        showToast(`导入失败：${words.length} 个词都没匹配到`);
+        return;
       }
-      if (skipped.length) console.warn('[Wordlist] Import — skipped (not in current wordlist):', skipped.slice(0, 30));
-      markedRanks = new Set(found);
-      saveMark();
+      if (notFound.length) console.warn('[Wordlist] Wordlist import — not found:', notFound.slice(0, 30));
+      currentList = list;
+      saveStoredWordlist();
+      currentPage = 1;
+      randomMode = null;
+      selectionMode = false;
+      clearShuffledCache();
       render();
-      showToast(`已导入 ${found.length} 个生词`);
+      showToast(`已导入词表 ${list.length} 个词` + (notFound.length ? `（${notFound.length} 个找不到）` : ''));
     } catch (e) {
-      console.error('[Wordlist] Import failed:', e);
-      showToast('导入失败');
-    } finally { event.target.value = ''; }
+      console.error('[Wordlist] Import wordlist failed:', e);
+      showToast('导入词表失败');
+    }
+  }
+
+  function exportCurrentWordlist() {
+    if (!currentList.length) { showToast('当前词表为空'); return; }
+    downloadText(currentList.map(e => e.word).join('\n'), 'wordlist.txt');
+    showToast('已导出当前词表');
+  }
+
+  async function handleImportMark(file) {
+    try {
+      const text = await file.text();
+      const words = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      if (!words.length) { showToast('文件为空'); return; }
+      const ranks = [];
+      const notFound = [];
+      for (const w of words) {
+        const entry = findByWord(w);
+        if (entry) ranks.push(entry.rank);
+        else notFound.push(w);
+      }
+      if (notFound.length) console.warn('[Wordlist] Mark import — not found:', notFound.slice(0, 30));
+      markedRanks = new Set(ranks);
+      saveMark();
+      clearShuffledCache();
+      render();
+      showToast(`已导入 ${ranks.length} 个生词` + (notFound.length ? `（${notFound.length} 个找不到）` : ''));
+    } catch (e) {
+      console.error('[Wordlist] Import mark failed:', e);
+      showToast('导入生词失败');
+    }
+  }
+
+  function exportAllMark() {
+    if (!markedRanks.size) { showToast('没有生词'); return; }
+    const words = allData
+      .filter(e => markedRanks.has(e.rank))
+      .sort((a, b) => a.rank - b.rank)
+      .map(e => e.word);
+    downloadText(words.join('\n'), 'mark.txt');
+    showToast(`已导出 ${words.length} 个生词`);
   }
 
   /* ============================================================
    * Dropdown
    * ============================================================ */
-  function toggleDropdown(menuId) {
-    const menu = document.getElementById(menuId);
-    if (!menu) return;
-    document.querySelectorAll('.dropdown-menu').forEach(m => {
-      if (m.id !== menuId) m.classList.remove('open');
-    });
-    menu.classList.toggle('open');
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    if (menu) menu.classList.toggle('open');
+  }
+  function closeMenu() {
+    const menu = document.getElementById('menu');
+    if (menu) menu.classList.remove('open');
   }
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.dropdown')) {
-      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
-    }
+    if (!e.target.closest('.dropdown')) closeMenu();
   });
 
   /* ============================================================
-   * Card click → 点单词开详情，复选框改 Mark
+   * Card click
    * ============================================================ */
   function handleCardClick(e) {
     const checkbox = e.target.closest('.card-check');
     if (checkbox) {
+      e.stopPropagation();
       setMark(Number(checkbox.dataset.rank), checkbox.checked);
-      render();
+      updateStatsOnly();
       return;
     }
     const wordEl = e.target.closest('.card-word');
@@ -869,19 +978,22 @@ h1 { font-size: 1.4rem; margin: 0; }
   }
 
   /* ============================================================
-   * Bind
+   * Bind events
    * ============================================================ */
   function bindEvents() {
-    document.getElementById('btn-theme').addEventListener('click', () => {
-      setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-    });
+    document.getElementById('btn-view-current').addEventListener('click', () => setViewMode('current'));
+    document.getElementById('btn-view-marked').addEventListener('click', () => setViewMode('marked'));
+    document.getElementById('btn-view-dict').addEventListener('click', () => setViewMode('dict'));
 
-    document.getElementById('btn-filter-unknown').addEventListener('click', () => setKnownFilter('unknown'));
-    document.getElementById('btn-filter-all').addEventListener('click', () => setKnownFilter('all'));
+    document.getElementById('btn-random-all').addEventListener('click', () => toggleRandom('all'));
+    document.getElementById('btn-random-marked').addEventListener('click', () => toggleRandom('marked'));
+    document.getElementById('btn-random').addEventListener('click', () => toggleRandom('all'));
+    document.getElementById('btn-selection').addEventListener('click', toggleSelection);
 
     searchInput.addEventListener('input', debounce(e => {
       searchQuery = e.target.value.trim().toLowerCase();
       currentPage = 1;
+      clearShuffledCache();
       render();
     }, 300));
 
@@ -889,65 +1001,60 @@ h1 { font-size: 1.4rem; margin: 0; }
       if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName)) {
         e.preventDefault(); searchInput.focus();
       }
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); closeMenu(); }
     });
 
-    document.getElementById('btn-random-all').addEventListener('click', () => startRandom('all'));
-    document.getElementById('btn-random-unknown').addEventListener('click', () => startRandom('unknown'));
-    document.getElementById('btn-reset-sort').addEventListener('click', resetSorting);
-
-    document.getElementById('btn-hide-word').addEventListener('click', () => {
-      hideWordMode = !hideWordMode;
-      currentPage = 1;
-      render();
+    // 菜单
+    document.getElementById('btn-menu').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
     });
 
-    document.getElementById('btn-pagination-toggle').addEventListener('click', () => {
+    document.getElementById('menu-import-wordlist').addEventListener('click', () => {
+      closeMenu();
+      fileImportWordlist.click();
+    });
+    document.getElementById('menu-export-wordlist').addEventListener('click', () => {
+      closeMenu();
+      exportCurrentWordlist();
+    });
+    document.getElementById('menu-import-mark').addEventListener('click', () => {
+      closeMenu();
+      fileImportMark.click();
+    });
+    document.getElementById('menu-export-mark').addEventListener('click', () => {
+      closeMenu();
+      exportAllMark();
+    });
+    document.getElementById('menu-pagination').addEventListener('click', () => {
       paginationEnabled = !paginationEnabled;
       try { localStorage.setItem(LS_PAGINATION, paginationEnabled ? 'paginate' : 'unpaginate'); } catch (e) {}
       currentPage = 1;
+      updateMenuState();
       render();
     });
-
-    document.getElementById('btn-selection').addEventListener('click', () => setSelectionMode(!selectionMode));
-    document.getElementById('btn-exit-selection').addEventListener('click', () => setSelectionMode(false));
-
-    document.getElementById('btn-mark-all').addEventListener('click', () => {
-      for (const e of displayData) markedRanks.add(e.rank);
-      saveMark(); render(); showToast('已标记');
+    document.getElementById('menu-theme').addEventListener('click', () => {
+      setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
     });
-    document.getElementById('btn-unmark-all').addEventListener('click', () => {
-      for (const e of displayData) markedRanks.delete(e.rank);
-      saveMark(); render(); showToast('已取消标记');
-    });
-    document.getElementById('btn-export-selection').addEventListener('click', exportMark);
-
-    document.getElementById('btn-importexport').addEventListener('click', e => {
-      e.stopPropagation(); toggleDropdown('importexport-menu');
-    });
-    document.getElementById('menu-export').addEventListener('click', e => {
-      e.stopPropagation();
-      document.getElementById('importexport-menu').classList.remove('open');
-      exportMark();
-    });
-    document.getElementById('menu-import').addEventListener('click', e => {
-      e.stopPropagation();
-      document.getElementById('importexport-menu').classList.remove('open');
-      fileInput.click();
-    });
-    fileInput.addEventListener('change', importMark);
-
-    document.getElementById('btn-wordlist').addEventListener('click', e => {
-      e.stopPropagation(); toggleDropdown('wordlist-menu');
-    });
-    document.getElementById('wordlist-menu').addEventListener('click', e => {
+    document.getElementById('menu').addEventListener('click', (e) => {
       const li = e.target.closest('li');
-      if (!li || li.classList.contains('divider')) return;
+      if (!li) return;
       const url = li.dataset.url;
       if (url) {
         window.open(url, '_blank');
-        document.getElementById('wordlist-menu').classList.remove('open');
+        closeMenu();
       }
+    });
+
+    fileImportWordlist.addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) await handleImportWordlist(f);
+      e.target.value = '';
+    });
+    fileImportMark.addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) await handleImportMark(f);
+      e.target.value = '';
     });
 
     modalClose.addEventListener('click', closeModal);
@@ -981,7 +1088,7 @@ h1 { font-size: 1.4rem; margin: 0; }
     buildWordIndex();
     buildRankMap();
 
-    await loadCurrentWordList();
+    await loadDefaultWordlist();
 
     if (!hasLocalMark) {
       await loadUnknown();
